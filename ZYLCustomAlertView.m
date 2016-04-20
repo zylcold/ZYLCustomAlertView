@@ -329,7 +329,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
                     obj.constant = ABS(height);
                 }
             }else {
-                obj.constant = 150;
+                obj.constant = -150;
             }
             
             *stop = YES;
