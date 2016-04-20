@@ -47,7 +47,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
         
         
         //设置默认属性
-        self.alertBackgroundColor = [UIColor red:0 green:0 blue:0 alpha:0.5];
+        self.alertBackgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
         self.entableAnimation = YES;
         self.entableTapDismiss = YES;
         self.autoBecomeFirstResponder = YES;
