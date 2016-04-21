@@ -15,47 +15,87 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
 @property(nonatomic, strong) UIView *contentView_p;
 //背景View
 @property(nonatomic, weak) UIView *backgroundView_p;
+//键盘弹出
+@property (nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
 @end
 @implementation ZYLCustomAlertView
 
-- (instancetype)init
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    if(self = [super initWithFrame:frame]) {
+        [self p_setupCustomView];
+    }
+    return self;
+}
+
+- (void)p_setupCustomView
+{
+    UIWindow *keyWindow = [self keyWindow_p];
+    [keyWindow.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if([obj isKindOfClass:[self class]]) {
+            [obj removeFromSuperview];
+        }
+    }];
+    self.frame = CGRectMake(0, 0, keyWindow.frame.size.width, keyWindow.frame.size.height);
+    self.backgroundColor = [UIColor clearColor];
+    
+    //背景View
+    UIView *backgroundView = [[UIView alloc] init];
+    [self addSubview:backgroundView];
+    backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[backgroundView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(backgroundView)]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[backgroundView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(backgroundView)]];
+    backgroundView.backgroundColor = [UIColor clearColor];
+    _backgroundView_p = backgroundView;
+    
+    
+    //点击空白区域 ,消失弹框
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToDismissSheetView:)];
+    [backgroundView addGestureRecognizer:tap];
+    _tapGR = tap;
+    
+    self.keyboardShow = NO;
+    //设置默认属性
+    self.alertBackgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
+    self.entableAnimation = YES;
+    self.entableTapDismiss = YES;
+    self.autoBecomeFirstResponder = YES;
+    self.showStyle = HQShowAlertFromBottom;
+}
+
+- (instancetype)initWithContentView:(UIView *)contentView
 {
     if(self = [super init]) {
-        UIWindow *keyWindow = [self keyWindow_p];
-        [keyWindow.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if([obj isKindOfClass:[self class]]) {
-                [obj removeFromSuperview];
-            }
-        }];
-        self.frame = CGRectMake(0, 0, keyWindow.frame.size.width, keyWindow.frame.size.height);
-        self.backgroundColor = [UIColor clearColor];
-        
-        //背景View
-        UIView *backgroundView = [[UIView alloc] init];
-        [self addSubview:backgroundView];
-        backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[backgroundView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(backgroundView)]];
-        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[backgroundView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(backgroundView)]];
-        backgroundView.backgroundColor = [UIColor clearColor];
-        _backgroundView_p = backgroundView;
-        
-        
-        //点击空白区域 ,消失弹框
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToDismissSheetView:)];
-        [backgroundView addGestureRecognizer:tap];
-        _tapGR = tap;
-        
-        
-        //设置默认属性
-        self.alertBackgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        self.entableAnimation = YES;
-        self.entableTapDismiss = YES;
-        self.autoBecomeFirstResponder = YES;
+        _contentView = contentView;
+        self.contentView_p = contentView;
     }
     return self;
 }
 
 
+
+- (instancetype)initWithContentInputView:(UIView<HQCustomInputView> *)contentView
+{
+    if(self = [super init]) {
+        _contentInputView = contentView;
+        self.contentView_p = contentView;
+    }
+    return self;
+}
+
++ (instancetype)addCustomView:(UIView *)view forPosition:(HQShowAlertStyle)position
+{
+    return [self addCustomView:view forPosition:position animaton:YES];
+}
+
++ (instancetype)addCustomView:(UIView *)view forPosition:(HQShowAlertStyle)position animaton:(BOOL)animaton
+{
+    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:view];
+    alertView.showStyle = position;
+    alertView.entableAnimation = animaton;
+    [alertView show];
+    return alertView;
+}
 
 //获取App KeyWindow
 - (UIWindow *)keyWindow_p
@@ -88,7 +128,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
     NSAssert(self.contentView_p, @"must have contentView");
     NSAssert(self.contentView_p.frame.size.width || self.contentView_p.frame.size.height, @"must have size");
     
-    //解决Xib View过大的问题
+    //解决直接加载Xib时 View过大的问题
     if(CGRectGetWidth(self.contentView_p.frame) > CGRectGetWidth([UIScreen mainScreen].bounds)) {
         CGFloat screenWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
         UIView *contentView_addNib = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, CGRectGetHeight(self.contentView_p.frame) * (screenWidth /CGRectGetWidth(self.contentView_p.frame)))];
@@ -124,13 +164,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
             
             
             if(self.contentView) {
-                [self.constraints enumerateObjectsUsingBlock:^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                    if(obj.firstItem == self && obj.firstAttribute == NSLayoutAttributeBottom && obj.secondItem == contentView) {
-                        obj.constant = 0;
-                        *stop = YES;
-                    }
-                }];
-                
+                [self finderBottomConstraintForView:contentView].constant = 0;
                 //更新约束，添加动画
                 [UIView animateWithDuration:0.25 animations:^{
                     [self updateConstraints];
@@ -139,20 +173,15 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
                 }];
             }else if(self.contentInputView){
                 
-                UIView<HQCustomInputView> *inputContentView = (UIView<HQCustomInputView> *)self.contentView_p;
-                
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handldNotification:) name:UIKeyboardWillChangeFrameNotification object:nil];
                 
                 if(self.autoBecomeFirstResponder) {
-                    [inputContentView inputViewBecomeFirstResponder];
-                }else {
-                    [self.constraints enumerateObjectsUsingBlock:^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                        if(obj.firstItem == self && obj.firstAttribute == NSLayoutAttributeBottom && obj.secondItem == contentView) {
-                            obj.constant = 0;
-                            *stop = YES;
-                        }
+                    [self.contentInputView inputViewBecomeFirstResponder];
+                    [UIView animateWithDuration:0.25 animations:^{
+                        _backgroundView_p.backgroundColor = self.alertBackgroundColor;
                     }];
-                    
+                }else {
+                    [self finderBottomConstraintForView:contentView].constant = 0;
                     //更新约束，添加动画
                     [UIView animateWithDuration:0.25 animations:^{
                         [self updateConstraints];
@@ -160,9 +189,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
                         _backgroundView_p.backgroundColor = self.alertBackgroundColor;
                     }];
                 }
-                [UIView animateWithDuration:0.25 animations:^{
-                    _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-                }];
+                
                 
             }
             break;
@@ -174,7 +201,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
             
             [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
             
-
+            
             if(self.entableAnimation) {
                 [self.contentView_p.layer addAnimation:[self transfromAnimation] forKey:@"hhh"];
                 [UIView animateWithDuration:0.25 animations:^{
@@ -183,7 +210,6 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
             }else {
                 _backgroundView_p.backgroundColor = self.alertBackgroundColor;
             }
-
             
             break;
         }
@@ -209,7 +235,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
     if(heightKeyboard > -100) {  //弹出
         [self showOrHideEditView:self.contentView_p WithShow:YES andHeight:heightKeyboard];
     }else {
-        [self showOrHideEditView:self.contentView_p WithShow:NO andHeight:heightKeyboard];
+        [self dismissEditView:self.contentView_p andHeight:CGRectGetHeight(self.contentView_p.frame)];
     }
     
     void(^animations)() = ^{
@@ -223,41 +249,39 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
 
 - (void)dismissSheetView
 {
+    
+    void(^finishedHandld)(BOOL finished) = ^(BOOL finished){
+        if(finished) {
+            if(self.tapDismissHandle) { self.tapDismissHandle(); }
+            [self removeFromSuperview];
+        }
+    };
     switch (_showStyle) {
         case HQShowAlertFromBottom:{
             
             if(self.contentView) {
-                [self updateConstraints];
-                [self layoutIfNeeded];
-                
-                
-                [self.constraints enumerateObjectsUsingBlock:^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                   if(obj.firstItem == self && obj.firstAttribute == NSLayoutAttributeBottom && obj.secondItem == self.contentView_p) {
-                       obj.constant = -CGRectGetHeight(self.contentView_p.frame);
-                       *stop = YES;
-                   }
-                }];
-                
+                [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
                 [UIView animateWithDuration:0.25 animations:^{
                     [self updateConstraints];
                     [self layoutIfNeeded];
                     _backgroundView_p.backgroundColor = [UIColor clearColor];
-                }completion:^(BOOL finished) {
-                    if(finished) {
-                        if(self.tapDismissHandle) { self.tapDismissHandle(); }
-                        [self removeFromSuperview];
-                    }
-                }];
+                }completion:finishedHandld];
             }else if(self.contentInputView) {
-                [self.contentInputView inputViewResignFirstResponder];
-                [UIView animateWithDuration:0.25 animations:^{
-                    _backgroundView_p.backgroundColor = [UIColor clearColor];
-                }completion:^(BOOL finished) {
-                    if(finished) {
-                        if(self.tapDismissHandle) { self.tapDismissHandle(); }
-                        [self removeFromSuperview];
-                    }
-                }];
+                if(self.isKeyboardShow) {
+                    [self.contentInputView inputViewResignFirstResponder];
+                    [UIView animateWithDuration:0.25 animations:^{
+                        _backgroundView_p.backgroundColor = [UIColor clearColor];
+                    }completion:finishedHandld];
+                }else {
+                    [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
+                    [UIView animateWithDuration:0.25 animations:^{
+                        [self updateConstraints];
+                        [self layoutIfNeeded];
+                        _backgroundView_p.backgroundColor = [UIColor clearColor];
+                    }completion:finishedHandld];
+                }
+                
+                
             }
             
             break;
@@ -267,10 +291,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
                 [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
                 [UIView animateWithDuration:0.15 animations:^{
                     _backgroundView_p.backgroundColor = [UIColor clearColor];
-                } completion:^(BOOL finished) {
-                    if(self.tapDismissHandle) { self.tapDismissHandle(); }
-                    [self removeFromSuperview];
-                }];
+                } completion:finishedHandld];
             }else {
                 [self removeFromSuperview];
             }
@@ -284,11 +305,16 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
     
 }
 
+- (void)dismissAnimationForHandld:(void(^)(void))handld
+{
+    
+}
+
 - (CABasicAnimation *)dismissTransfromAnimation
 {
     CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     fooAnimation.fromValue = @(1);
-    fooAnimation.duration = 0.15;
+    fooAnimation.duration = 0.1;
     fooAnimation.toValue = @(0);
     fooAnimation.fillMode = kCAFillModeForwards;
     fooAnimation.removedOnCompletion = NO;
@@ -299,7 +325,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
 {
     CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     fooAnimation.fromValue = @(0);
-    fooAnimation.duration = 0.15;
+    fooAnimation.duration = 0.1;
     fooAnimation.toValue = @(1);
     return fooAnimation;
 }
@@ -318,25 +344,41 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
     _contentView_p = contentInputView;
 }
 
-- (void)showOrHideEditView:(id)editView WithShow:(BOOL)show andHeight:(CGFloat)height
+- (NSLayoutConstraint *)finderBottomConstraintForView:(UIView *)view
 {
+    __block NSLayoutConstraint *temConstraint = nil;
     [self.constraints enumerateObjectsUsingBlock:^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if(obj.firstItem==self && obj.secondItem == editView && obj.firstAttribute == NSLayoutAttributeBottom) {
-            if(show) {
-                if(ABS(height) < 100) {
-                    obj.constant += height;
-                }else {
-                    obj.constant = ABS(height);
-                }
-            }else {
-                obj.constant = -150;
-            }
-            
+        if(obj.firstItem==self && obj.secondItem == view && obj.firstAttribute == NSLayoutAttributeBottom) {
+            temConstraint = obj;
             *stop = YES;
         }
     }];
     
+    return temConstraint;
 }
+
+
+- (void)showOrHideEditView:(id)editView WithShow:(BOOL)show andHeight:(CGFloat)height
+{
+    self.keyboardShow = show;
+    
+    if(show) {
+        if(ABS(height) < 100) {
+            [self finderBottomConstraintForView:editView].constant += height;
+        }else {
+            [self finderBottomConstraintForView:editView].constant = ABS(height);
+        }
+    }else {
+        [self finderBottomConstraintForView:editView].constant = 0;
+    }
+}
+
+- (void)dismissEditView:(id)editView andHeight:(CGFloat)height
+{
+    [self finderBottomConstraintForView:editView].constant = -height;
+}
+
+
 
 
 @end

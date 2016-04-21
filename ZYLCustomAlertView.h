@@ -25,7 +25,7 @@ typedef NS_ENUM(NSInteger, HQShowAlertStyle) {
 @property(nonatomic, strong) UIView<HQCustomInputView> *contentInputView;
 /**&lt; 背景 defult [UIColor red:0 green:0 blue:0 alpha:0.5]; */
 @property(nonatomic, strong) UIColor *alertBackgroundColor;
-/**&lt; 展示的位置 */
+/**&lt; 展示的位置 defult HQShowAlertFromBottom*/
 @property(nonatomic, assign) HQShowAlertStyle showStyle;
 /**&lt; 点击其他区域是否隐藏 defult Yes */
 @property(nonatomic, assign) BOOL entableTapDismiss;
@@ -36,6 +36,16 @@ typedef NS_ENUM(NSInteger, HQShowAlertStyle) {
 @property(nonatomic, assign) BOOL entableAnimation;
 /**&lt; 自动成为响应者 defult YES */
 @property (nonatomic, assign) BOOL autoBecomeFirstResponder;
+
+- (instancetype)initWithContentView:(UIView *)contentView;
+
+- (instancetype)initWithContentInputView:(UIView<HQCustomInputView> *)contentView;
+
+/**&lt; 使用默认方式展示一个自定义View */
++ (instancetype)addCustomView:(UIView *)view forPosition:(HQShowAlertStyle)position;
+
+/**&lt; 使用默认方式展示一个自定义View */
++ (instancetype)addCustomView:(UIView *)view forPosition:(HQShowAlertStyle)position animaton:(BOOL)animaton;
 
 /**&lt; 展示 */
 - (void)show;

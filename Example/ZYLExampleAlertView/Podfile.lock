@@ -1,0 +1,14 @@
+PODS:
+  - ZYLCustomAlertView (0.0.1)
+
+DEPENDENCIES:
+  - ZYLCustomAlertView (from `../../`)
+
+EXTERNAL SOURCES:
+  ZYLCustomAlertView:
+    :path: ../../
+
+SPEC CHECKSUMS:
+  ZYLCustomAlertView: 60dd4ffb381f50ea76899b22399b4c3bb139d8a3
+
+COCOAPODS: 0.36.0
