@@ -1,5 +1,5 @@
 //
-//  HQCustomAlertView.m
+//  ZYLCustomAlertView.m
 //  HunterQuiz
 //
 //  Created by test on 12/14/15.
@@ -7,7 +7,7 @@
 //
 
 #import "ZYLCustomAlertView.h"
-static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation";
+static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimation";
 @interface ZYLCustomAlertView()
 //点击手势
 @property(nonatomic, weak) UITapGestureRecognizer *tapGR;
@@ -60,7 +60,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
     self.entableAnimation = YES;
     self.entableTapDismiss = YES;
     self.autoBecomeFirstResponder = YES;
-    self.showStyle = HQShowAlertFromBottom;
+    self.showStyle =ZYLShowAlertFromBottom;
 }
 
 - (instancetype)initWithContentView:(UIView *)contentView
@@ -74,7 +74,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
 
 
 
-- (instancetype)initWithContentInputView:(UIView<HQCustomInputView> *)contentView
+- (instancetype)initWithContentInputView:(UIViewZYLCustomInputView> *)contentView
 {
     if(self = [super init]) {
         _contentInputView = contentView;
@@ -83,12 +83,12 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
     return self;
 }
 
-+ (instancetype)addCustomView:(UIView *)view forPosition:(HQShowAlertStyle)position
++ (instancetype)addCustomView:(UIView *)view forPosition:ZYLShowAlertStyle)position
 {
     return [self addCustomView:view forPosition:position animaton:YES];
 }
 
-+ (instancetype)addCustomView:(UIView *)view forPosition:(HQShowAlertStyle)position animaton:(BOOL)animaton
++ (instancetype)addCustomView:(UIView *)view forPosition:ZYLShowAlertStyle)position animaton:(BOOL)animaton
 {
     ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:view];
     alertView.showStyle = position;
@@ -149,7 +149,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
     UIView *contentView = self.contentView_p;
     contentView.translatesAutoresizingMaskIntoConstraints = NO;
     switch (_showStyle) {
-        case HQShowAlertFromBottom:{
+        caseZYLShowAlertFromBottom:{
             
             [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[contentView(%f)]-(-%f)-|", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
             
@@ -195,7 +195,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
             break;
         }
             
-        case HQShowAlertFromCenter:{
+        caseZYLShowAlertFromCenter:{
             
             [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[superview]-(<=1)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:@{@"width" : @(CGRectGetWidth(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
             
@@ -257,7 +257,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
         }
     };
     switch (_showStyle) {
-        case HQShowAlertFromBottom:{
+        caseZYLShowAlertFromBottom:{
             
             if(self.contentView) {
                 [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
@@ -286,7 +286,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
             
             break;
         }
-        case HQShowAlertFromCenter:{
+        caseZYLShowAlertFromCenter:{
             if(self.entableAnimation) {
                 [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
                 [UIView animateWithDuration:0.15 animations:^{
@@ -338,7 +338,7 @@ static NSString *const kFinishAnimationKey = @"HQCustomAlertView.FinishAnimation
 }
 
 
-- (void)setContentInputView:(UIView<HQCustomInputView> *)contentInputView
+- (void)setContentInputView:(UIViewZYLCustomInputView> *)contentInputView
 {
     _contentInputView = contentInputView;
     _contentView_p = contentInputView;
