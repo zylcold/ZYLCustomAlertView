@@ -149,7 +149,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
     UIView *contentView = self.contentView_p;
     contentView.translatesAutoresizingMaskIntoConstraints = NO;
     switch (_showStyle) {
-        case:ZYLShowAlertFromBottom:{
+        case ZYLShowAlertFromBottom:{
             
             [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[contentView(%f)]-(-%f)-|", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
             
@@ -195,7 +195,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
             break;
         }
             
-        case:ZYLShowAlertFromCenter:{
+        case ZYLShowAlertFromCenter:{
             
             [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[superview]-(<=1)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:@{@"width" : @(CGRectGetWidth(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
             
@@ -257,7 +257,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
         }
     };
     switch (_showStyle) {
-        case:ZYLShowAlertFromBottom:{
+        case ZYLShowAlertFromBottom:{
             
             if(self.contentView) {
                 [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
@@ -286,7 +286,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
             
             break;
         }
-        case:ZYLShowAlertFromCenter:{
+        case ZYLShowAlertFromCenter:{
             if(self.entableAnimation) {
                 [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
                 [UIView animateWithDuration:0.15 animations:^{
