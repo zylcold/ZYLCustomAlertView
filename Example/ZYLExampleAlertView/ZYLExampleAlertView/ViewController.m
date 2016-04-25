@@ -28,27 +28,27 @@
 - (void)buttonOnClickToAlertBottom:(id)sender
 {
 //    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:[self aCustomView]];
-//    alertView.showStyle = HQShowAlertFromBottom;
+//    alertView.showStyle = ZYLShowAlertFromBottom;
 //    [alertView show];
 //    [[[ZYLCustomAlertView alloc] initWithContentView:[self aCustomView]] show];
-    [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:HQShowAlertFromBottom];
+    [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromBottom];
 }
 - (void)buttonOnClickToAlertCenterNoAnim
 {
     ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] init];
     alertView.contentView = [self aCustomView];
-    alertView.showStyle = HQShowAlertFromCenter;
+    alertView.showStyle = ZYLShowAlertFromCenter;
     alertView.entableAnimation = NO;
     [alertView show];
     
-//    [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:HQShowAlertFromCenter animaton:NO];
+//    [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromCenter animaton:NO];
 }
 
 - (void)buttonOnClickToAlertCenter:(id)sender
 {
     ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] init];
     alertView.contentView = [self aCustomView];
-    alertView.showStyle = HQShowAlertFromCenter;
+    alertView.showStyle = ZYLShowAlertFromCenter;
     [alertView show];
 }
 
