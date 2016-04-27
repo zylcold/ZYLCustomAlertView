@@ -292,7 +292,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
                     _backgroundView_p.backgroundColor = [UIColor clearColor];
                 } completion:finishedHandld];
             }else {
-                [self removeFromSuperview];
+                finishedHandld();
             }
             
             break;
