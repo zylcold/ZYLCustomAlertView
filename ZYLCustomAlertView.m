@@ -7,8 +7,13 @@
 //
 
 #import "ZYLCustomAlertView.h"
-static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimation";
-@interface ZYLCustomAlertView()
+static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAnimation";
+
+@interface ZYLCustomAlertToolsView : UIView
+
+@property(nonatomic, assign) CGPoint transformBegan;
+
+@property(nonatomic, strong) ZYLCustomAlertToolsView *tools;
 //点击手势
 @property(nonatomic, weak) UITapGestureRecognizer *tapGR;
 //显示View
@@ -17,8 +22,44 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
 @property(nonatomic, weak) UIView *backgroundView_p;
 //键盘弹出
 @property (nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
+
+//展示View 只需设置size
+@property(nonatomic, strong) UIView *contentView;
+//带有InputView
+@property(nonatomic, strong) UIView<ZYLCustomInputView> *contentInputView;
+//背景 defult [UIColor red:0 green:0 blue:0 alpha:0.5];
+@property(nonatomic, strong) UIColor *alertBackgroundColor;
+// 展示的位置 defult ZYLShowAlertFromBottom
+@property(nonatomic, assign) ZYLShowAlertStyle showStyle;
+// 点击其他区域是否隐藏 defult Yes
+@property(nonatomic, assign) BOOL entableTapDismiss;
+// 隐藏时的操作
+@property(nonatomic, copy) void(^tapDismissHandle)(void);
+
+//打开动画
+@property(nonatomic, assign) BOOL entableAnimation;
+// 自动成为响应者 defult YES
+@property (nonatomic, assign) BOOL autoBecomeFirstResponder;
+
+
+- (instancetype)initWithContentView:(UIView *)contentView;
+
+- (instancetype)initWithContentInputView:(UIView<ZYLCustomInputView> *)contentView;
+
+// 使用默认方式展示一个自定义View
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position;
+
+// 使用默认方式展示一个自定义View
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
+
+// 展示
+- (void)show;
+
+// 隐藏
+- (void)dismissSheetView;
+
 @end
-@implementation ZYLCustomAlertView
+@implementation ZYLCustomAlertToolsView
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -54,6 +95,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
     [backgroundView addGestureRecognizer:tap];
     _tapGR = tap;
     
+    
     self.keyboardShow = NO;
     //设置默认属性
     self.alertBackgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -72,8 +114,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
     return self;
 }
 
-
-
 - (instancetype)initWithContentInputView:(UIView<ZYLCustomInputView> *)contentView
 {
     if(self = [super init]) {
@@ -90,7 +130,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
 
 + (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton
 {
-    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:view];
+    ZYLCustomAlertToolsView *alertView = [[ZYLCustomAlertToolsView alloc] initWithContentView:view];
     alertView.showStyle = position;
     alertView.entableAnimation = animaton;
     return alertView;
@@ -116,6 +156,35 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
     }
 }
 
+- (void)panToSheetView:(UIPanGestureRecognizer *)panGR
+{
+
+    switch (panGR.state) {
+        case UIGestureRecognizerStateBegan:{
+            _transformBegan =  [panGR translationInView: self.contentView_p];
+            break;
+        }
+        case UIGestureRecognizerStateChanged:{
+            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
+            self.contentView_p.transform = CGAffineTransformMakeTranslation(0, transformChanged.y-_transformBegan.y >= 0 ? transformChanged.y-_transformBegan.y : 0);
+            break;
+        }
+        default:{
+            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
+            if(transformChanged.y-_transformBegan.y > CGRectGetHeight(self.contentView_p.frame)*.3) {
+                [self dismissSheetView];
+            }else {
+                [UIView animateWithDuration:0.15 animations:^{
+                    self.contentView_p.transform = CGAffineTransformIdentity;
+                }];
+            }
+            _transformBegan =  CGPointZero;
+            break;
+        }
+    }
+
+}
+
 - (void)setEntableTapDismiss:(BOOL)entableTapDismiss
 {
     _entableTapDismiss = entableTapDismiss;
@@ -126,6 +195,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
 {
     NSAssert(self.contentView_p, @"must have contentView");
     NSAssert(self.contentView_p.frame.size.width || self.contentView_p.frame.size.height, @"must have size");
+    
+    UIPanGestureRecognizer *panGR = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panToSheetView:)];
+    [self.contentView_p addGestureRecognizer:panGR];
     
     //解决直接加载Xib时 View过大的问题
     if(CGRectGetWidth(self.contentView_p.frame) > CGRectGetWidth([UIScreen mainScreen].bounds)) {
@@ -292,7 +364,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
                     _backgroundView_p.backgroundColor = [UIColor clearColor];
                 } completion:finishedHandld];
             }else {
-                finishedHandld();
+                finishedHandld(YES);
             }
             
             break;
@@ -376,8 +448,110 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertView.FinishAnimatio
 {
     [self finderBottomConstraintForView:editView].constant = -height;
 }
+@end
 
 
+
+@interface ZYLCustomAlertView()
+@property(nonatomic, strong) ZYLCustomAlertToolsView *customAlertView;
+@end
+
+@implementation ZYLCustomAlertView
+
+- (instancetype)initWithContentView:(UIView *)contentView
+{
+    if(self = [super init]) {
+        self.customAlertView = [[ZYLCustomAlertToolsView alloc] initWithContentView:contentView];
+        self.customAlertView.tools = self;
+    }
+    return self;
+}
+
+- (instancetype)initWithContentInputView:(UIView<ZYLCustomInputView> *)contentView
+{
+    if(self = [super init]) {
+        self.customAlertView = [[ZYLCustomAlertToolsView alloc] initWithContentInputView:contentView];
+        self.customAlertView.tools = self;
+    }
+    return self;
+}
+
+- (instancetype)init
+{
+    if(self = [super init]) {
+        self.customAlertView = [[ZYLCustomAlertToolsView alloc] init];
+        self.customAlertView.tools = self;
+    }
+    return self;
+}
+
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor
+{
+    _backgroundColor = backgroundColor;
+    self.customAlertView.alertBackgroundColor = backgroundColor;
+}
+
+- (void)setShowStyle:(ZYLShowAlertStyle)showStyle
+{
+    _showStyle = showStyle;
+    self.customAlertView.showStyle = showStyle;
+}
+
+- (void)setEntableAnimation:(BOOL)entableAnimation
+{
+    _entableAnimation = entableAnimation;
+    self.customAlertView.entableAnimation = entableAnimation;
+}
+
+- (void)setEntableTapDismiss:(BOOL)entableTapDismiss
+{
+    _entableTapDismiss = entableTapDismiss;
+    self.customAlertView.entableTapDismiss = entableTapDismiss;
+}
+
+- (void)setContentView:(UIView *)contentView
+{
+    _contentView = contentView;
+    self.customAlertView.contentView = contentView;
+}
+
+- (void)setContentInputView:(UIView<ZYLCustomInputView> *)contentInputView
+{
+    _contentInputView = contentInputView;
+    self.customAlertView.contentInputView = contentInputView;
+}
+
+- (void)setTapDismissHandle:(void (^)(void))tapDismissHandle
+{
+    _tapDismissHandle = tapDismissHandle;
+    self.customAlertView.tapDismissHandle = tapDismissHandle;
+}
+
+- (void)show
+{
+    [self.customAlertView show];
+}
+
+- (void)dismissSheetView
+{
+    [self.customAlertView dismissSheetView];
+    self.customAlertView = nil;
+}
+
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position
+{
+    return [ZYLCustomAlertView addCustomView:view forPosition:position animaton:YES];
+}
+
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton
+{
+    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:view];
+    alertView.showStyle = position;
+    alertView.entableAnimation = animaton;
+    return alertView;
+}
 
 
 @end
+
