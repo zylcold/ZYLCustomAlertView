@@ -51,7 +51,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }];
     self.frame = CGRectMake(0, 0, keyWindow.frame.size.width, keyWindow.frame.size.height);
     self.backgroundColor = [UIColor clearColor];
-    
     //背景View
     UIView *backgroundView = [[UIView alloc] init];
     [self addSubview:backgroundView];
@@ -86,7 +85,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (void)tapToDismissSheetView:(UITapGestureRecognizer *)tapGR
 {
     if(!CGRectContainsPoint(self.contentView_p.frame, [tapGR locationInView:self])) {
-        [self dismissSheetView];
+        [self tapTodismissSheetView];
     }
 }
 
@@ -144,15 +143,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         self.panGR = panGR;
     }
     self.panGR.enabled = self.entablePanGestureRecognizer && self.entableAnimation && self.contentInputView == nil;
-    
-    
-//    [self.contentView_p.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//        if([obj isKindOfClass:[UIScrollView class]]) {
-//            self.scrollView = obj;
-////            [self.scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
-//            *stop = YES;
-//        }
-//    }];
     
     //解决直接加载Xib时 View过大的问题
     if(CGRectGetWidth(self.contentView_p.frame) > CGRectGetWidth([UIScreen mainScreen].bounds)) {
@@ -247,6 +237,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.contentView_p.layer removeAllAnimations];
 }
 
 - (void)handldNotification:(NSNotification *)notifacation
@@ -270,6 +261,10 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     [UIView animateWithDuration:duration delay:0.0f options:(curve << 16 | UIViewAnimationOptionBeginFromCurrentState) animations:animations completion:nil];
 }
 
+- (void)tapTodismissSheetView
+{
+    [self.tools dismissSheetView];
+}
 
 - (void)dismissSheetView
 {
@@ -277,6 +272,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         if(finished) {
             if(self.tapDismissHandle) { self.tapDismissHandle(); }
             self.tools = nil;
+            [self.contentView_p removeFromSuperview];
             [self removeFromSuperview];
 
         }
@@ -434,8 +430,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
                 scrollView.bounces = YES;
                 return NO;
             }
-            
-//            [scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
         }
     }
     return NO;
