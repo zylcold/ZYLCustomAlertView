@@ -544,6 +544,12 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     self.customAlertView.entablePanGestureRecognizer = entablePanGestureRecognizer;
 }
 
+- (void)setAutoBecomeFirstResponder:(BOOL)autoBecomeFirstResponder
+{
+    _autoBecomeFirstResponder = autoBecomeFirstResponder;
+    self.customAlertView.autoBecomeFirstResponder = autoBecomeFirstResponder;
+}
+
 - (void)setOffset:(CGPoint)offset
 {
     _offset = offset;
