@@ -37,6 +37,9 @@ typedef NS_ENUM(NSInteger, ZYLShowAlertStyle) {
 /**&lt; 打开拖拽手势 */
 @property(nonatomic, assign) BOOL entablePanGestureRecognizer;
 
+/**&lt; 背景 */
+@property(nonatomic, weak) UIView *backgroundView;
+
 @property(nonatomic, assign) CGPoint offset; //未实现
 /**&lt; 自动成为响应者 defult YES */
 @property (nonatomic, assign) BOOL autoBecomeFirstResponder;

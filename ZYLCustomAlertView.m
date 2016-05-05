@@ -493,6 +493,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     self.autoBecomeFirstResponder = YES;
     self.showStyle = ZYLShowAlertFromBottom;
     self.entablePanGestureRecognizer = NO;
+    self.backgroundView = self.customAlertView.backgroundView_p;
 }
 
 
