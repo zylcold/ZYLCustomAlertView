@@ -22,7 +22,7 @@
     
     [[self aCustomButtonWithTitle:@"中间展示（无动画）" andFrame:CGRectMake(100, 180, 160, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
     
-    self.datas = @[@"", @"", @"", @"", @"", @"", @"", @""];
+    self.datas = @[@"", @"", @"", @"", @"", @"", @"", @"", @"", @"", @""];
 }
 
 
@@ -33,7 +33,9 @@
 //    alertView.showStyle = ZYLShowAlertFromBottom;
 //    [alertView show];
 //    [[[ZYLCustomAlertView alloc] initWithContentView:[self aCustomView]] show];
-    [[ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromBottom] show];
+    ZYLCustomAlertView *alertView = [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromBottom];
+    alertView.entablePanGestureRecognizer = YES;
+    [alertView show];
 }
 - (void)buttonOnClickToAlertCenterNoAnim
 {
@@ -41,6 +43,7 @@
     alertView.contentView = [self aCustomView];
     alertView.showStyle = ZYLShowAlertFromCenter;
     alertView.entableAnimation = NO;
+
     [alertView show];
     
 //    [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromCenter animaton:NO];
@@ -51,6 +54,7 @@
     ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] init];
     alertView.contentView = [self aCustomView];
     alertView.showStyle = ZYLShowAlertFromCenter;
+    alertView.entablePanGestureRecognizer = YES;
     [alertView show];
 }
 

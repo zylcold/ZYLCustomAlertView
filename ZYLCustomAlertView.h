@@ -23,6 +23,7 @@ typedef NS_ENUM(NSInteger, ZYLShowAlertStyle) {
 @property(nonatomic, strong) UIView *contentView;
 /**&lt; 带有InputView */
 @property(nonatomic, strong) UIView<ZYLCustomInputView> *contentInputView;
+
 /**&lt; 背景 defult [UIColor red:0 green:0 blue:0 alpha:0.5]; */
 @property(nonatomic, strong) UIColor *backgroundColor;
 /**&lt; 展示的位置 defult ZYLShowAlertFromBottom*/
@@ -31,8 +32,12 @@ typedef NS_ENUM(NSInteger, ZYLShowAlertStyle) {
 @property(nonatomic, assign) BOOL entableTapDismiss;
 /**&lt; 隐藏时的操作 */
 @property(nonatomic, copy) void(^tapDismissHandle)(void);
-//打开动画
+/**&lt; 打开动画 */
 @property(nonatomic, assign) BOOL entableAnimation;
+/**&lt; 打开拖拽手势 */
+@property(nonatomic, assign) BOOL entablePanGestureRecognizer;
+
+@property(nonatomic, assign) CGPoint offset; //未实现
 /**&lt; 自动成为响应者 defult YES */
 @property (nonatomic, assign) BOOL autoBecomeFirstResponder;
 
