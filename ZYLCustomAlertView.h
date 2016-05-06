@@ -16,7 +16,7 @@
 typedef NS_ENUM(NSInteger, ZYLShowAlertStyle) {
     ZYLShowAlertFromBottom,
     ZYLShowAlertFromCenter,
-    ZYLShowAlertFromCustom //未实现
+    ZYLShowAlertFromCustom
 };
 @interface ZYLCustomAlertView : NSObject
 /**&lt; 展示View 只需设置size  */
@@ -32,9 +32,9 @@ typedef NS_ENUM(NSInteger, ZYLShowAlertStyle) {
 @property(nonatomic, assign) BOOL entableTapDismiss;
 /**&lt; 隐藏时的操作 */
 @property(nonatomic, copy) void(^tapDismissHandle)(void);
-/**&lt; 打开动画 */
+/**&lt; 打开动画 defult YES*/
 @property(nonatomic, assign) BOOL entableAnimation;
-/**&lt; 打开拖拽手势 */
+/**&lt; 打开拖拽手势 defult NO */
 @property(nonatomic, assign) BOOL entablePanGestureRecognizer;
 
 /**&lt; 背景 */

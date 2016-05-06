@@ -9,15 +9,9 @@
 #import "ZYLCustomAlertView.h"
 static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAnimation";
 @interface ZYLCustomAlertToolsView : UIView<UIGestureRecognizerDelegate>
-@property(nonatomic, assign) CGPoint transformBegan;
-@property(nonatomic, strong) ZYLCustomAlertToolsView *tools;
 @property(nonatomic, weak) UITapGestureRecognizer *tapGR;
 @property(nonatomic, weak) UIPanGestureRecognizer *panGR;
-@property(nonatomic, strong) UIView *contentView_p;
 @property(nonatomic, weak) UIView *backgroundView_p;
-//@property(nonatomic, weak) UIScrollView *scrollView;
-@property(nonatomic, assign) BOOL panToDismiss;
-@property (nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
 @property(nonatomic, strong) UIView *contentView;
 @property(nonatomic, strong) UIView<ZYLCustomInputView> *contentInputView;
 @property(nonatomic, strong) UIColor *alertBackgroundColor;
@@ -28,6 +22,13 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 @property(nonatomic, assign) BOOL entableAnimation;
 @property (nonatomic, assign) BOOL autoBecomeFirstResponder;
 @property(nonatomic, assign) BOOL entablePanGestureRecognizer;
+
+@property(nonatomic, assign) BOOL panToDismiss;
+@property(nonatomic, strong) UIView *contentView_p;
+@property(nonatomic, strong) ZYLCustomAlertView *tools;
+@property(nonatomic, assign) CGPoint transformBegan;
+@property (nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
+
 - (void)show;
 - (void)dismissSheetView;
 @end
@@ -99,7 +100,13 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         }
         case UIGestureRecognizerStateChanged:{
             CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
-            self.contentView_p.transform = CGAffineTransformMakeTranslation(0, transformChanged.y-_transformBegan.y >= 0 ? transformChanged.y-_transformBegan.y : 0);
+            CGFloat transformY = transformChanged.y-_transformBegan.y >= 0 ? transformChanged.y-_transformBegan.y : 0;
+            CGFloat screenHeight = CGRectGetHeight([self mainScreen]);
+            CGFloat progressToDismiss = (screenHeight - CGRectGetMinY(self.contentView_p.frame)  + .5*CGRectGetHeight(self.contentView_p.frame)) / (screenHeight - ((CGRectGetMinY(self.contentView_p.frame))-transformY) + .5*CGRectGetHeight(self.contentView_p.frame));
+            self.contentView_p.transform = CGAffineTransformMakeTranslation(0, transformY);
+            [UIView animateWithDuration:0.15 animations:^{
+                self.backgroundView_p.alpha = progressToDismiss;
+            }];
             break;
         }
         case UIGestureRecognizerStateEnded:{
@@ -110,6 +117,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             }else {
                 [UIView animateWithDuration:0.15 animations:^{
                     self.contentView_p.transform = CGAffineTransformIdentity;
+                    self.backgroundView_p.alpha = 1;
                 }];
             }
             _transformBegan =  CGPointZero;
@@ -145,9 +153,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     self.panGR.enabled = self.entablePanGestureRecognizer && self.entableAnimation && self.contentInputView == nil;
     
     //解决直接加载Xib时 View过大的问题
-    if(CGRectGetWidth(self.contentView_p.frame) > CGRectGetWidth([UIScreen mainScreen].bounds)) {
-        CGFloat screenWidth = CGRectGetWidth([UIScreen mainScreen].bounds);
-        UIView *contentView_addNib = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, CGRectGetHeight(self.contentView_p.frame) * (screenWidth /CGRectGetWidth(self.contentView_p.frame)))];
+    if(CGRectGetWidth(self.contentView_p.frame) > CGRectGetWidth([self mainScreen])) {
+        CGFloat screenWidth = CGRectGetWidth([self mainScreen]);
+        UIView *contentView_addNib = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, CGRectGetHeight(self.contentView_p.frame) * (screenWidth / CGRectGetWidth(self.contentView_p.frame)))];
         [contentView_addNib addSubview:self.contentView_p];
         
         UIView *teamView = self.contentView_p;
@@ -229,9 +237,79 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             
             break;
         }
+        case ZYLShowAlertFromCustom:{
+            CGFloat screenW = CGRectGetWidth([self mainScreen]);
+            CGFloat screenH = CGRectGetHeight([self mainScreen]);
+            CGFloat contentViewX = CGRectGetMinX(contentView.frame);
+            CGFloat contentViewY = CGRectGetMinY(contentView.frame);
+            CGFloat contentViewH = CGRectGetHeight(contentView.frame);
+            CGFloat contentViewW = CGRectGetWidth(contentView.frame);
+            CGFloat contentMarginL = contentViewX;
+            CGFloat contentMarginR = screenW-CGRectGetMaxX(contentView.frame);
+            CGFloat contentMarginT = contentViewY;
+            CGFloat contentMarginB = screenH - CGRectGetMinY(contentView.frame);
+            
+            CGFloat viewX = 0;
+            CGFloat viewY = 0;
+            if(contentMarginT >= contentViewH) {  //上面
+                if(contentMarginL >= contentViewW / 2  && contentMarginR >= contentViewW / 2) { //中间
+                    contentView.layer.anchorPoint = CGPointMake(0.5, 1);
+                    viewX = contentViewX - contentViewW * .5;
+                    viewY = contentViewY - contentViewH * .5;
+                }else {
+                    if(contentMarginL < contentViewW / 2) { //右上
+                        contentView.layer.anchorPoint = CGPointMake(0, 1);
+                        viewX = contentViewX-contentViewW * .5;
+                        viewY = contentViewY-contentViewH * .5;
+                    }else { //左上
+                        contentView.layer.anchorPoint = CGPointMake(1, 1);
+                        viewX = contentViewX-contentViewW*.5;
+                        viewY = contentViewY-contentViewH*.5;
+                    }
+                }
+            }else {
+                if(contentMarginL >= contentViewW / 2  && contentMarginR >= contentViewW / 2) { //中间
+                    contentView.layer.anchorPoint = CGPointMake(0.5, 0);
+                    viewX = contentViewX-contentViewW*.5;
+                    viewY = contentViewY-contentViewH*.5;
+                }else {
+                    if(contentMarginL < contentViewW / 2) { //右下
+                        contentView.layer.anchorPoint = CGPointMake(0, 0);
+                        viewX = contentViewX-contentViewW*.5;
+                        viewY = contentViewY-contentViewH*.5;
+                    }else { //左下
+                        contentView.layer.anchorPoint = CGPointMake(1, 0);
+                        viewX = contentViewX-contentViewW*.5;
+                        viewY = contentViewY-contentViewH*.5;
+                    }
+                }
+            }
+            
+            NSDictionary *metricsDict = @{@"width" : @(contentViewW), @"height" : @(contentViewH), @"viewX" : @(viewX), @"viewY" : @(viewY)};
+            NSDictionary *viewDict = NSDictionaryOfVariableBindings(contentView);
+            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(viewX)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:metricsDict views:viewDict]];
+            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(viewY)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:metricsDict views:viewDict]];
+            
+            if(self.entableAnimation) {
+                [contentView.layer addAnimation:[self transfromAnimation] forKey:@"hhhh"];
+                [UIView animateWithDuration:0.15 animations:^{
+                    _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+                }];
+            }else {
+                _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+            }
+           
+            break;
+        }
         default:
             break;
     }
+}
+
+//获取展示区域的大小
+- (CGRect)mainScreen
+{
+    return [UIScreen mainScreen].bounds;
 }
 
 - (void)dealloc
@@ -325,8 +403,13 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             
             break;
         }
-        default:
+        case ZYLShowAlertFromCustom:{
+            [UIView animateWithDuration:0.15 animations:^{
+                _backgroundView_p.backgroundColor = [UIColor clearColor];
+            } completion:finishedHandld];
             break;
+        }
+            
     }
 }
 
@@ -345,7 +428,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 {
     CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.translation.y"];
     fooAnimation.duration = 0.25;
-    fooAnimation.toValue = @([UIScreen mainScreen].bounds.size.height-CGRectGetMinX(self.contentView_p.frame));
+    fooAnimation.toValue = @([self mainScreen].size.height-CGRectGetMinX(self.contentView_p.frame));
     fooAnimation.fillMode = kCAFillModeForwards;
     fooAnimation.removedOnCompletion = NO;
     return fooAnimation;
@@ -354,10 +437,10 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 {
     if([UIDevice currentDevice].systemVersion.floatValue >= 9.0) {
         CASpringAnimation *spring = [CASpringAnimation animationWithKeyPath:@"transform.scale"];
-        spring.damping = 15;
-        spring.stiffness = 100;
-        spring.mass = 1.1;
-        spring.initialVelocity = 10;
+        spring.damping = 20;
+        spring.stiffness = 120;
+        spring.mass = 1.2;
+        spring.initialVelocity = 15;
         spring.fromValue = @(0);
         spring.toValue = @(1);
         spring.duration = spring.settlingDuration;

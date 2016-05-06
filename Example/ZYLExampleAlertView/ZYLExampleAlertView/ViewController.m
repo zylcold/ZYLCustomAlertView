@@ -23,8 +23,24 @@
     [[self aCustomButtonWithTitle:@"中间展示（无动画）" andFrame:CGRectMake(100, 180, 160, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
     
     self.datas = @[@"", @"", @"", @"", @"", @"", @"", @"", @"", @"", @""];
+    
+    
+    UITapGestureRecognizer *tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapViewToAlert:)];
+    [self.view addGestureRecognizer:tapGR];
 }
 
+- (void)tapViewToAlert:(UITapGestureRecognizer *)tapGR
+{
+    CGPoint point = [tapGR locationInView:self.view];
+    UIView *customView = [self aCustomView];
+    customView.frame = (CGRect) {
+        .size = customView.frame.size,
+        .origin = point
+    };
+    ZYLCustomAlertView *alertView = [ZYLCustomAlertView addCustomView:customView forPosition:ZYLShowAlertFromCustom];
+    [alertView show];
+    
+}
 
 
 - (void)buttonOnClickToAlertBottom:(id)sender
@@ -71,11 +87,11 @@
 
 - (UIView *)aCustomView
 {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 300)];
-    UITableView *tableView = [[UITableView alloc] initWithFrame:view.bounds];
-    [view addSubview:tableView];
-    tableView.dataSource = self;
-    tableView.rowHeight = 44;
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 300)];
+//    UITableView *tableView = [[UITableView alloc] initWithFrame:view.bounds];
+//    [view addSubview:tableView];
+//    tableView.dataSource = self;
+//    tableView.rowHeight = 44;
     view.backgroundColor = [UIColor blueColor];
     return view;
 }
