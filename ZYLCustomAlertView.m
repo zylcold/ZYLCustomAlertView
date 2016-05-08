@@ -29,6 +29,8 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 @property(nonatomic, assign) CGPoint transformBegan;
 @property (nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
 
+@property (nonatomic, assign) ZYLAlertCompass compass;
+
 - (void)show;
 - (void)dismissSheetView;
 @end
@@ -93,6 +95,77 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (void)panToSheetView:(UIPanGestureRecognizer *)panGR
 {
 
+    switch (self.showStyle) {
+        case ZYLShowAlertFromBottom:
+        case ZYLShowAlertFromCenter:
+            [self handldPanGRForNoShowCustom:panGR];
+            break;
+        case ZYLShowAlertFromCustom:
+//            [self handldPanGRForShowCustom:panGR];
+            break;
+    }
+}
+
+
+- (void)handldPanGRForShowCustom:(UIPanGestureRecognizer *)panGR
+{
+    switch (panGR.state) {
+        case UIGestureRecognizerStateBegan:{
+            _transformBegan =  [panGR translationInView: self.contentView_p];
+            break;
+        }
+        case UIGestureRecognizerStateChanged:{
+            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
+            CGFloat transformY = transformChanged.y-_transformBegan.y;
+            switch (self.compass) {
+                case ZYLAlertCompassForTop | ZYLAlertCompassForCenter:
+                case ZYLAlertCompassForTop | ZYLAlertCompassForLeft:
+                case ZYLAlertCompassForTop | ZYLAlertCompassForRight:{
+                    if(transformY >= 0) {
+                        
+                    }
+                    break;
+                }
+                case ZYLAlertCompassForBottom | ZYLAlertCompassForCenter:
+                case ZYLAlertCompassForBottom | ZYLAlertCompassForLeft:
+                case ZYLAlertCompassForBottom | ZYLAlertCompassForRight:{
+                    if(transformY <= 0) {
+                        CGFloat progress = 1 - (-transformY) / CGRectGetHeight(self.contentView_p.frame);
+                        if(progress < 1 && progress >= 0) {
+                            self.contentView_p.transform = CGAffineTransformMakeScale(progress*1.2, progress*1.2);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case UIGestureRecognizerStateEnded:{
+            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
+            CGFloat transformY = transformChanged.y-_transformBegan.y;
+            if(ABS(transformY) > 0.3 * CGRectGetHeight(self.contentView_p.frame)) {
+                self.panToDismiss = YES;
+                [self dismissSheetView];
+            }else {
+                [UIView animateWithDuration:0.15 animations:^{
+                    self.contentView_p.transform = CGAffineTransformIdentity;
+                }];
+            }
+            
+        }
+        default:{
+            [UIView animateWithDuration:0.15 animations:^{
+                self.contentView_p.transform = CGAffineTransformIdentity;
+            }];
+            break;
+        }
+    }
+}
+
+- (void)handldPanGRForNoShowCustom:(UIPanGestureRecognizer *)panGR
+{
     switch (panGR.state) {
         case UIGestureRecognizerStateBegan:{
             _transformBegan =  [panGR translationInView: self.contentView_p];
@@ -252,35 +325,41 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             CGFloat viewX = 0;
             CGFloat viewY = 0;
             if(contentMarginT >= contentViewH) {  //上面
-                if(contentMarginL >= contentViewW / 2  && contentMarginR >= contentViewW / 2) { //中间
+                if(contentMarginL >= contentViewW / 2  && contentMarginR >= -contentViewW*0.5) { //中间
                     contentView.layer.anchorPoint = CGPointMake(0.5, 1);
                     viewX = contentViewX - contentViewW * .5;
                     viewY = contentViewY - contentViewH * .5;
+                    self.compass = ZYLAlertCompassForTop | ZYLAlertCompassForCenter;
                 }else {
                     if(contentMarginL < contentViewW / 2) { //右上
                         contentView.layer.anchorPoint = CGPointMake(0, 1);
                         viewX = contentViewX-contentViewW * .5;
                         viewY = contentViewY-contentViewH * .5;
+                        self.compass = ZYLAlertCompassForRight | ZYLAlertCompassForTop;
                     }else { //左上
                         contentView.layer.anchorPoint = CGPointMake(1, 1);
                         viewX = contentViewX-contentViewW*.5;
                         viewY = contentViewY-contentViewH*.5;
+                        self.compass = ZYLAlertCompassForTop | ZYLAlertCompassForLeft;
                     }
                 }
             }else {
-                if(contentMarginL >= contentViewW / 2  && contentMarginR >= contentViewW / 2) { //中间
+                if(contentMarginL >= contentViewW / 2  && contentMarginR >= -contentViewW*0.5) { //中间
                     contentView.layer.anchorPoint = CGPointMake(0.5, 0);
                     viewX = contentViewX-contentViewW*.5;
                     viewY = contentViewY-contentViewH*.5;
+                    self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForCenter;
                 }else {
                     if(contentMarginL < contentViewW / 2) { //右下
                         contentView.layer.anchorPoint = CGPointMake(0, 0);
                         viewX = contentViewX-contentViewW*.5;
                         viewY = contentViewY-contentViewH*.5;
+                        self.compass = ZYLShowAlertFromBottom | ZYLAlertCompassForRight;
                     }else { //左下
                         contentView.layer.anchorPoint = CGPointMake(1, 0);
                         viewX = contentViewX-contentViewW*.5;
                         viewY = contentViewY-contentViewH*.5;
+                        self.compass = ZYLShowAlertFromBottom | ZYLAlertCompassForLeft;
                     }
                 }
             }

@@ -13,11 +13,23 @@
 - (void)inputViewResignFirstResponder;
 @end
 
+//展示位置
 typedef NS_ENUM(NSInteger, ZYLShowAlertStyle) {
     ZYLShowAlertFromBottom,
     ZYLShowAlertFromCenter,
     ZYLShowAlertFromCustom
 };
+
+//展示方向
+typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
+    ZYLAlertCompassForTop = 1 << 1,
+    ZYLAlertCompassForBottom = 1 << 2,
+    ZYLAlertCompassForLeft = 1 << 3,
+    ZYLAlertCompassForRight = 1 << 4,
+    ZYLAlertCompassForCenter = 1 << 5
+};
+
+
 @interface ZYLCustomAlertView : NSObject
 /**&lt; 展示View 只需设置size  */
 @property(nonatomic, strong) UIView *contentView;

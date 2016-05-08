@@ -38,6 +38,7 @@
         .origin = point
     };
     ZYLCustomAlertView *alertView = [ZYLCustomAlertView addCustomView:customView forPosition:ZYLShowAlertFromCustom];
+    alertView.entablePanGestureRecognizer = YES;
     [alertView show];
     
 }

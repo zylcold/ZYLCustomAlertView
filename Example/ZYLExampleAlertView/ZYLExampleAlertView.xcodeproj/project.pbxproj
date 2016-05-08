@@ -108,7 +108,6 @@
 				AECB2D5F1CC9196F00003EE3 /* Sources */,
 				AECB2D601CC9196F00003EE3 /* Frameworks */,
 				AECB2D611CC9196F00003EE3 /* Resources */,
-				64BA58E8C50C9C2BFFF18E49 /* Embed Pods Frameworks */,
 				D8D64A8A34B479D7D52983DF /* Copy Pods Resources */,
 			);
 			buildRules = (
@@ -165,21 +164,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		64BA58E8C50C9C2BFFF18E49 /* Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		D8D64A8A34B479D7D52983DF /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
