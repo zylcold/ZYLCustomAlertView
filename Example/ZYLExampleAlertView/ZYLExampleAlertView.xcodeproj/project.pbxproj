@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A6C9EA01ABD6FF6B045A1C62 /* libPods-ZYLExampleAlertView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A11AB7A70A6C0532430865 /* libPods-ZYLExampleAlertView.a */; };
+		9329851D351378FDD2311749 /* libPods-ZYLExampleAlertView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FE89703B357726C3FB72CE0F /* libPods-ZYLExampleAlertView.a */; };
 		AE25210E1CC91FB1001D2D40 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AE25210D1CC91FB1001D2D40 /* Default-568h@2x.png */; };
 		AECB2D681CC9196F00003EE3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AECB2D671CC9196F00003EE3 /* main.m */; };
 		AECB2D6B1CC9196F00003EE3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AECB2D6A1CC9196F00003EE3 /* AppDelegate.m */; };
@@ -15,7 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		5D1293D2404070BDF01CD8B5 /* Pods-ZYLExampleAlertView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZYLExampleAlertView.release.xcconfig"; path = "Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView.release.xcconfig"; sourceTree = "<group>"; };
+		27D0C2A9E26C22EBAF453A72 /* Pods-ZYLExampleAlertView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZYLExampleAlertView.release.xcconfig"; path = "Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView.release.xcconfig"; sourceTree = "<group>"; };
 		AE25210D1CC91FB1001D2D40 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		AECB2D631CC9196F00003EE3 /* ZYLExampleAlertView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZYLExampleAlertView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AECB2D671CC9196F00003EE3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -24,8 +24,8 @@
 		AECB2D6C1CC9196F00003EE3 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		AECB2D6D1CC9196F00003EE3 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		AECB2D771CC9196F00003EE3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F17D88EDEC75CE41E173E6EE /* Pods-ZYLExampleAlertView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZYLExampleAlertView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView.debug.xcconfig"; sourceTree = "<group>"; };
-		F2A11AB7A70A6C0532430865 /* libPods-ZYLExampleAlertView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZYLExampleAlertView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F6B559189905A5130C70177A /* Pods-ZYLExampleAlertView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZYLExampleAlertView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView.debug.xcconfig"; sourceTree = "<group>"; };
+		FE89703B357726C3FB72CE0F /* libPods-ZYLExampleAlertView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZYLExampleAlertView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,28 +33,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6C9EA01ABD6FF6B045A1C62 /* libPods-ZYLExampleAlertView.a in Frameworks */,
+				9329851D351378FDD2311749 /* libPods-ZYLExampleAlertView.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4EF406724738BE29BF02AEDE /* Pods */ = {
+		6065B3C768F0F80F1AE9FEC3 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F17D88EDEC75CE41E173E6EE /* Pods-ZYLExampleAlertView.debug.xcconfig */,
-				5D1293D2404070BDF01CD8B5 /* Pods-ZYLExampleAlertView.release.xcconfig */,
+				F6B559189905A5130C70177A /* Pods-ZYLExampleAlertView.debug.xcconfig */,
+				27D0C2A9E26C22EBAF453A72 /* Pods-ZYLExampleAlertView.release.xcconfig */,
 			);
 			name = Pods;
-			sourceTree = "<group>";
-		};
-		91E538B93B2F58028E649D5C /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				F2A11AB7A70A6C0532430865 /* libPods-ZYLExampleAlertView.a */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		AECB2D5A1CC9196F00003EE3 = {
@@ -62,8 +54,8 @@
 			children = (
 				AECB2D651CC9196F00003EE3 /* ZYLExampleAlertView */,
 				AECB2D641CC9196F00003EE3 /* Products */,
-				4EF406724738BE29BF02AEDE /* Pods */,
-				91E538B93B2F58028E649D5C /* Frameworks */,
+				6065B3C768F0F80F1AE9FEC3 /* Pods */,
+				CB2E76DFC6B71A44A16A276A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,6 +89,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		CB2E76DFC6B71A44A16A276A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FE89703B357726C3FB72CE0F /* libPods-ZYLExampleAlertView.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -104,11 +104,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AECB2D7A1CC9196F00003EE3 /* Build configuration list for PBXNativeTarget "ZYLExampleAlertView" */;
 			buildPhases = (
-				EEEB4F40BE39FAE91DE2BA5A /* Check Pods Manifest.lock */,
+				AC2782B08E1F398973A8E7B3 /* Check Pods Manifest.lock */,
 				AECB2D5F1CC9196F00003EE3 /* Sources */,
 				AECB2D601CC9196F00003EE3 /* Frameworks */,
 				AECB2D611CC9196F00003EE3 /* Resources */,
-				D8D64A8A34B479D7D52983DF /* Copy Pods Resources */,
+				A4510D355E5F7ABEC7CE87F7 /* Embed Pods Frameworks */,
+				5B4A03C500EC112FBF2E5FB5 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -164,7 +165,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		D8D64A8A34B479D7D52983DF /* Copy Pods Resources */ = {
+		5B4A03C500EC112FBF2E5FB5 /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -179,7 +180,22 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EEEB4F40BE39FAE91DE2BA5A /* Check Pods Manifest.lock */ = {
+		A4510D355E5F7ABEC7CE87F7 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AC2782B08E1F398973A8E7B3 /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -294,7 +310,7 @@
 		};
 		AECB2D7B1CC9196F00003EE3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F17D88EDEC75CE41E173E6EE /* Pods-ZYLExampleAlertView.debug.xcconfig */;
+			baseConfigurationReference = F6B559189905A5130C70177A /* Pods-ZYLExampleAlertView.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -308,7 +324,7 @@
 		};
 		AECB2D7C1CC9196F00003EE3 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D1293D2404070BDF01CD8B5 /* Pods-ZYLExampleAlertView.release.xcconfig */;
+			baseConfigurationReference = 27D0C2A9E26C22EBAF453A72 /* Pods-ZYLExampleAlertView.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

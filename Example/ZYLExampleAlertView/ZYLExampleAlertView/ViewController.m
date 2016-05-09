@@ -88,7 +88,7 @@
 
 - (UIView *)aCustomView
 {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 300)];
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 300)];
 //    UITableView *tableView = [[UITableView alloc] initWithFrame:view.bounds];
 //    [view addSubview:tableView];
 //    tableView.dataSource = self;

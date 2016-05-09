@@ -101,7 +101,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             [self handldPanGRForNoShowCustom:panGR];
             break;
         case ZYLShowAlertFromCustom:
-//            [self handldPanGRForShowCustom:panGR];
+            [self handldPanGRForShowCustom:panGR];
             break;
     }
 }
@@ -129,11 +129,16 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
                 case ZYLAlertCompassForBottom | ZYLAlertCompassForCenter:
                 case ZYLAlertCompassForBottom | ZYLAlertCompassForLeft:
                 case ZYLAlertCompassForBottom | ZYLAlertCompassForRight:{
-                    if(transformY <= 0) {
-                        CGFloat progress = 1 - (-transformY) / CGRectGetHeight(self.contentView_p.frame);
-                        if(progress < 1 && progress >= 0) {
-                            self.contentView_p.transform = CGAffineTransformMakeScale(progress*1.2, progress*1.2);
-                        }
+            
+                    CGFloat progress = ((300-_transformBegan.y) + transformY) / (300-_transformBegan.y);
+                    if(CGRectGetHeight(self.contentView_p.frame) / 300 >= 0.2 && progress > 0 && progress < 1) {
+                        NSLog(@"%f", progress);
+                        [UIView animateWithDuration:0.1 animations:^{
+                            self.contentView_p.transform = CGAffineTransformMakeScale(progress, progress);
+                        }];
+                    }else if(CGRectGetHeight(self.contentView_p.frame) / 300 < 0.2){
+                        self.panToDismiss = YES;
+                        [self dismissSheetView];
                     }
                     break;
                 }
@@ -143,22 +148,22 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             break;
         }
         case UIGestureRecognizerStateEnded:{
-            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
-            CGFloat transformY = transformChanged.y-_transformBegan.y;
-            if(ABS(transformY) > 0.3 * CGRectGetHeight(self.contentView_p.frame)) {
-                self.panToDismiss = YES;
-                [self dismissSheetView];
-            }else {
-                [UIView animateWithDuration:0.15 animations:^{
-                    self.contentView_p.transform = CGAffineTransformIdentity;
-                }];
-            }
+//            CGPoint transformChanged =  [panGR translationInView: self];
+//            CGFloat transformY = transformChanged.y-_transformBegan.y;
+//            if(ABS(transformY) > 0.3 * CGRectGetHeight(self.contentView_p.frame)) {
+//                self.panToDismiss = YES;
+//                [self dismissSheetView];
+//            }else {
+//                [UIView animateWithDuration:0.15 animations:^{
+//                    self.contentView_p.transform = CGAffineTransformIdentity;
+//                }];
+//            }
             
         }
         default:{
-            [UIView animateWithDuration:0.15 animations:^{
-                self.contentView_p.transform = CGAffineTransformIdentity;
-            }];
+//            [UIView animateWithDuration:0.15 animations:^{
+//                self.contentView_p.transform = CGAffineTransformIdentity;
+//            }];
             break;
         }
     }
@@ -354,12 +359,12 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
                         contentView.layer.anchorPoint = CGPointMake(0, 0);
                         viewX = contentViewX-contentViewW*.5;
                         viewY = contentViewY-contentViewH*.5;
-                        self.compass = ZYLShowAlertFromBottom | ZYLAlertCompassForRight;
+                        self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForRight;
                     }else { //左下
                         contentView.layer.anchorPoint = CGPointMake(1, 0);
                         viewX = contentViewX-contentViewW*.5;
                         viewY = contentViewY-contentViewH*.5;
-                        self.compass = ZYLShowAlertFromBottom | ZYLAlertCompassForLeft;
+                        self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForLeft;
                     }
                 }
             }
