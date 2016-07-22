@@ -411,11 +411,16 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     UIViewAnimationCurve curve = [userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
     CGFloat heightKeyboard = beginR.origin.y-endR.origin.y;
     
-    if(heightKeyboard > -100) {  //弹出
-        [self showOrHideEditView:self.contentView_p WithShow:YES andHeight:heightKeyboard];
-    }else {
+    if(beginR.origin.y == [UIScreen mainScreen].bounds.size.height) {
+        self.keyboardShow = YES;
+        [self showEditView:self.contentView_p withHeight:endR.size.height];
+    }else if(endR.origin.y == [UIScreen mainScreen].bounds.size.height) {
         [self dismissEditView:self.contentView_p andHeight:CGRectGetHeight(self.contentView_p.frame)];
+    }else {
+        self.keyboardShow = YES;
+        [self showEditView:self.contentView_p withHeight:endR.size.height];
     }
+    
     void(^animations)() = ^{
         [self updateConstraints];
         [self layoutIfNeeded];
@@ -451,7 +456,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             }else if(self.contentInputView) {
                 if(self.isKeyboardShow) {
                     [self.contentInputView inputViewResignFirstResponder];
-                    [UIView animateWithDuration:0.25 animations:^{
+                    [UIView animateWithDuration:0.3 animations:^{
                         _backgroundView_p.backgroundColor = [UIColor clearColor];
                     }completion:finishedHandld];
                 }else {
@@ -552,19 +557,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     _contentView_p = contentInputView;
 }
 
-- (void)showOrHideEditView:(id)editView WithShow:(BOOL)show andHeight:(CGFloat)height
+- (void)showEditView:(UIView *)editView withHeight:(CGFloat)height
 {
-    self.keyboardShow = show;
-    
-    if(show) {
-        if(ABS(height) < 100) {
-            [self finderBottomConstraintForView:editView].constant += height;
-        }else {
-            [self finderBottomConstraintForView:editView].constant = ABS(height);
-        }
-    }else {
-        [self finderBottomConstraintForView:editView].constant = 0;
-    }
+    [self finderBottomConstraintForView:editView].constant = height;
 }
 
 - (void)dismissEditView:(id)editView andHeight:(CGFloat)height

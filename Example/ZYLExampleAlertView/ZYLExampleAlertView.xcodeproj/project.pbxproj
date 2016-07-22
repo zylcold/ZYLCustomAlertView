@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5248D9151D420C0F0064584D /* Default-716h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5248D9141D420C0F0064584D /* Default-716h@3x.png */; };
+		5248D9171D420C260064584D /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5248D9161D420C260064584D /* Default-568h@2x.png */; };
+		5248D9191D42105E0064584D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5248D9181D42105E0064584D /* Images.xcassets */; };
 		9329851D351378FDD2311749 /* libPods-ZYLExampleAlertView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FE89703B357726C3FB72CE0F /* libPods-ZYLExampleAlertView.a */; };
-		AE25210E1CC91FB1001D2D40 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AE25210D1CC91FB1001D2D40 /* Default-568h@2x.png */; };
 		AECB2D681CC9196F00003EE3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AECB2D671CC9196F00003EE3 /* main.m */; };
 		AECB2D6B1CC9196F00003EE3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AECB2D6A1CC9196F00003EE3 /* AppDelegate.m */; };
 		AECB2D6E1CC9196F00003EE3 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AECB2D6D1CC9196F00003EE3 /* ViewController.m */; };
@@ -16,7 +18,9 @@
 
 /* Begin PBXFileReference section */
 		27D0C2A9E26C22EBAF453A72 /* Pods-ZYLExampleAlertView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZYLExampleAlertView.release.xcconfig"; path = "Pods/Target Support Files/Pods-ZYLExampleAlertView/Pods-ZYLExampleAlertView.release.xcconfig"; sourceTree = "<group>"; };
-		AE25210D1CC91FB1001D2D40 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		5248D9141D420C0F0064584D /* Default-716h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-716h@3x.png"; sourceTree = "<group>"; };
+		5248D9161D420C260064584D /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		5248D9181D42105E0064584D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		AECB2D631CC9196F00003EE3 /* ZYLExampleAlertView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZYLExampleAlertView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AECB2D671CC9196F00003EE3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AECB2D691CC9196F00003EE3 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -75,6 +79,7 @@
 				AECB2D6C1CC9196F00003EE3 /* ViewController.h */,
 				AECB2D6D1CC9196F00003EE3 /* ViewController.m */,
 				AECB2D771CC9196F00003EE3 /* Info.plist */,
+				5248D9181D42105E0064584D /* Images.xcassets */,
 				AECB2D661CC9196F00003EE3 /* Supporting Files */,
 			);
 			path = ZYLExampleAlertView;
@@ -83,7 +88,8 @@
 		AECB2D661CC9196F00003EE3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				AE25210D1CC91FB1001D2D40 /* Default-568h@2x.png */,
+				5248D9161D420C260064584D /* Default-568h@2x.png */,
+				5248D9141D420C0F0064584D /* Default-716h@3x.png */,
 				AECB2D671CC9196F00003EE3 /* main.m */,
 			);
 			name = "Supporting Files";
@@ -158,7 +164,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE25210E1CC91FB1001D2D40 /* Default-568h@2x.png in Resources */,
+				5248D9191D42105E0064584D /* Images.xcassets in Resources */,
+				5248D9151D420C0F0064584D /* Default-716h@3x.png in Resources */,
+				5248D9171D420C260064584D /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,9 +320,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F6B559189905A5130C70177A /* Pods-ZYLExampleAlertView.debug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = ZYLExampleAlertView/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Zhu.ZYLExampleAlertView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -326,9 +337,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27D0C2A9E26C22EBAF453A72 /* Pods-ZYLExampleAlertView.release.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = ZYLExampleAlertView/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.Zhu.ZYLExampleAlertView;
 				PRODUCT_NAME = "$(TARGET_NAME)";

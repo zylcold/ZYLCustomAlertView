@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-@protocol ZYLCustomInputView
+@protocol ZYLCustomInputView<NSObject>
 @required
 - (void)inputViewBecomeFirstResponder;
 - (void)inputViewResignFirstResponder;
