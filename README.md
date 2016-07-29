@@ -1,8 +1,8 @@
 # ZYLCustomAlertView
 
-##CocoaPod
+## CocoaPod
   pod 'ZYLCustomAlertView', :git => 'https://github.com/zylcold/ZYLCustomAlertView.git'
   
-##License
+## License
 
   MIT
