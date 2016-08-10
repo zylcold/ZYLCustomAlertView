@@ -22,7 +22,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 @property(nonatomic, assign) BOOL entableAnimation;
 @property (nonatomic, assign) BOOL autoBecomeFirstResponder;
 @property(nonatomic, assign) BOOL entablePanGestureRecognizer;
-
 @property(nonatomic, assign) BOOL panToDismiss;
 @property(nonatomic, strong) UIView *contentView_p;
 @property(nonatomic, strong) ZYLCustomAlertView *tools;
@@ -101,7 +100,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             [self handldPanGRForNoShowCustom:panGR];
             break;
         case ZYLShowAlertFromCustom:
-//            [self handldPanGRForShowCustom:panGR];
+            [self handldPanGRForShowCustom:panGR];
             break;
     }
 }
@@ -109,59 +108,64 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 - (void)handldPanGRForShowCustom:(UIPanGestureRecognizer *)panGR
 {
-    switch (panGR.state) {
-        case UIGestureRecognizerStateBegan:{
-            _transformBegan =  [panGR translationInView: self.contentView_p];
-            break;
-        }
-        case UIGestureRecognizerStateChanged:{
-            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
-            CGFloat transformY = transformChanged.y-_transformBegan.y;
-            switch (self.compass) {
-                case ZYLAlertCompassForTop | ZYLAlertCompassForCenter:
-                case ZYLAlertCompassForTop | ZYLAlertCompassForLeft:
-                case ZYLAlertCompassForTop | ZYLAlertCompassForRight:{
-                    if(transformY >= 0) {
-                        
-                    }
-                    break;
-                }
-                case ZYLAlertCompassForBottom | ZYLAlertCompassForCenter:
-                case ZYLAlertCompassForBottom | ZYLAlertCompassForLeft:
-                case ZYLAlertCompassForBottom | ZYLAlertCompassForRight:{
-                    if(transformY <= 0) {
-                        CGFloat progress = 1 - (-transformY) / CGRectGetHeight(self.contentView_p.frame);
-                        if(progress < 1 && progress >= 0) {
-                            self.contentView_p.transform = CGAffineTransformMakeScale(progress*1.2, progress*1.2);
-                        }
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-            break;
-        }
-        case UIGestureRecognizerStateEnded:{
-            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
-            CGFloat transformY = transformChanged.y-_transformBegan.y;
-            if(ABS(transformY) > 0.3 * CGRectGetHeight(self.contentView_p.frame)) {
-                self.panToDismiss = YES;
-                [self dismissSheetView];
-            }else {
-                [UIView animateWithDuration:0.15 animations:^{
-                    self.contentView_p.transform = CGAffineTransformIdentity;
-                }];
-            }
-            
-        }
-        default:{
-            [UIView animateWithDuration:0.15 animations:^{
-                self.contentView_p.transform = CGAffineTransformIdentity;
-            }];
-            break;
-        }
-    }
+//    switch (panGR.state) {
+//        case UIGestureRecognizerStateBegan:{
+//            _transformBegan =  [panGR translationInView: self.contentView_p];
+//            break;
+//        }
+//        case UIGestureRecognizerStateChanged:{
+//            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
+//            CGFloat transformY = transformChanged.y-_transformBegan.y;
+//            switch (self.compass) {
+//                case ZYLAlertCompassForTop | ZYLAlertCompassForCenter:
+//                case ZYLAlertCompassForTop | ZYLAlertCompassForLeft:
+//                case ZYLAlertCompassForTop | ZYLAlertCompassForRight:{
+//                    if(transformY >= 0) {
+//                        
+//                    }
+//                    break;
+//                }
+//                case ZYLAlertCompassForBottom | ZYLAlertCompassForCenter:
+//                case ZYLAlertCompassForBottom | ZYLAlertCompassForLeft:
+//                case ZYLAlertCompassForBottom | ZYLAlertCompassForRight:{
+//            
+//                    CGFloat progress = ((300-_transformBegan.y) + transformY) / (300-_transformBegan.y);
+//                    if(CGRectGetHeight(self.contentView_p.frame) / 300 >= 0.2 && progress > 0 && progress < 1) {
+//                        NSLog(@"%f", progress);
+//                        [UIView animateWithDuration:0.1 animations:^{
+//                            self.contentView_p.transform = CGAffineTransformMakeScale(progress, progress);
+//                        }];
+//                    }else if(CGRectGetHeight(self.contentView_p.frame) / 300 < 0.2){
+//                        self.panToDismiss = YES;
+//                        [self dismissSheetView];
+//                    }
+//                    break;
+//                }
+//                default:
+//                    break;
+//            }
+//            break;
+//        }
+//        case UIGestureRecognizerStateEnded:{
+//            CGPoint transformChanged =  [panGR translationInView: self];
+//            CGFloat transformY = transformChanged.y-_transformBegan.y;
+//            if(ABS(transformY) > 0.3 * CGRectGetHeight(self.contentView_p.frame)) {
+//                self.panToDismiss = YES;
+//                [self dismissSheetView];
+//            }else {
+//                [UIView animateWithDuration:0.15 animations:^{
+//                    self.contentView_p.transform = CGAffineTransformIdentity;
+//                }];
+//            }
+//            
+//        }
+//        default:{
+//            [UIView animateWithDuration:0.15 animations:^{
+//                self.contentView_p.transform = CGAffineTransformIdentity;
+//            }];
+//            break;
+//        }
+//    }
 }
 
 - (void)handldPanGRForNoShowCustom:(UIPanGestureRecognizer *)panGR
@@ -312,7 +316,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         }
         case ZYLShowAlertFromCustom:{
             CGFloat screenW = CGRectGetWidth([self mainScreen]);
-            CGFloat screenH = CGRectGetHeight([self mainScreen]);
             CGFloat contentViewX = CGRectGetMinX(contentView.frame);
             CGFloat contentViewY = CGRectGetMinY(contentView.frame);
             CGFloat contentViewH = CGRectGetHeight(contentView.frame);
@@ -320,7 +323,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             CGFloat contentMarginL = contentViewX;
             CGFloat contentMarginR = screenW-CGRectGetMaxX(contentView.frame);
             CGFloat contentMarginT = contentViewY;
-            CGFloat contentMarginB = screenH - CGRectGetMinY(contentView.frame);
             
             CGFloat viewX = 0;
             CGFloat viewY = 0;
@@ -354,12 +356,12 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
                         contentView.layer.anchorPoint = CGPointMake(0, 0);
                         viewX = contentViewX-contentViewW*.5;
                         viewY = contentViewY-contentViewH*.5;
-                        self.compass = ZYLShowAlertFromBottom | ZYLAlertCompassForRight;
+                        self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForRight;
                     }else { //左下
                         contentView.layer.anchorPoint = CGPointMake(1, 0);
                         viewX = contentViewX-contentViewW*.5;
                         viewY = contentViewY-contentViewH*.5;
-                        self.compass = ZYLShowAlertFromBottom | ZYLAlertCompassForLeft;
+                        self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForLeft;
                     }
                 }
             }
@@ -404,13 +406,17 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     CGRect endR = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGFloat duration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
     UIViewAnimationCurve curve = [userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
-    CGFloat heightKeyboard = beginR.origin.y-endR.origin.y;
     
-    if(heightKeyboard > -100) {  //弹出
-        [self showOrHideEditView:self.contentView_p WithShow:YES andHeight:heightKeyboard];
-    }else {
+    if(beginR.origin.y == [UIScreen mainScreen].bounds.size.height) {
+        self.keyboardShow = YES;
+        [self showEditView:self.contentView_p withHeight:endR.size.height];
+    }else if(endR.origin.y == [UIScreen mainScreen].bounds.size.height) {
         [self dismissEditView:self.contentView_p andHeight:CGRectGetHeight(self.contentView_p.frame)];
+    }else {
+        self.keyboardShow = YES;
+        [self showEditView:self.contentView_p withHeight:endR.size.height];
     }
+    
     void(^animations)() = ^{
         [self updateConstraints];
         [self layoutIfNeeded];
@@ -446,7 +452,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             }else if(self.contentInputView) {
                 if(self.isKeyboardShow) {
                     [self.contentInputView inputViewResignFirstResponder];
-                    [UIView animateWithDuration:0.25 animations:^{
+                    [UIView animateWithDuration:0.3 animations:^{
                         _backgroundView_p.backgroundColor = [UIColor clearColor];
                     }completion:finishedHandld];
                 }else {
@@ -483,7 +489,10 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             break;
         }
         case ZYLShowAlertFromCustom:{
-            [UIView animateWithDuration:0.15 animations:^{
+            if(self.entableAnimation) {
+                [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
+            }
+            [UIView animateWithDuration:0.25 animations:^{
                 _backgroundView_p.backgroundColor = [UIColor clearColor];
             } completion:finishedHandld];
             break;
@@ -500,6 +509,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     fooAnimation.toValue = @(0);
     fooAnimation.fillMode = kCAFillModeForwards;
     fooAnimation.removedOnCompletion = NO;
+    fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.84 :.14 :.95 :0.42];
     return fooAnimation;
 }
 
@@ -527,9 +537,10 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }else {
         CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
         fooAnimation.fromValue = @(0);
-        fooAnimation.duration = 0.1;
+        fooAnimation.duration = 0.25;
         fooAnimation.toValue = @(1);
         fooAnimation.fillMode = kCAFillModeForwards;
+        fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.03 :.54 :.07 :0.98];
         fooAnimation.removedOnCompletion = NO;
         return fooAnimation;
     }
@@ -547,19 +558,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     _contentView_p = contentInputView;
 }
 
-- (void)showOrHideEditView:(id)editView WithShow:(BOOL)show andHeight:(CGFloat)height
+- (void)showEditView:(UIView *)editView withHeight:(CGFloat)height
 {
-    self.keyboardShow = show;
-    
-    if(show) {
-        if(ABS(height) < 100) {
-            [self finderBottomConstraintForView:editView].constant += height;
-        }else {
-            [self finderBottomConstraintForView:editView].constant = ABS(height);
-        }
-    }else {
-        [self finderBottomConstraintForView:editView].constant = 0;
-    }
+    [self finderBottomConstraintForView:editView].constant = height;
 }
 
 - (void)dismissEditView:(id)editView andHeight:(CGFloat)height
@@ -737,7 +738,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     alertView.entableAnimation = animaton;
     return alertView;
 }
-
 
 @end
 

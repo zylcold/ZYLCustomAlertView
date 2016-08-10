@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-@protocol ZYLCustomInputView
+@protocol ZYLCustomInputView<NSObject>
 @required
 - (void)inputViewBecomeFirstResponder;
 - (void)inputViewResignFirstResponder;
@@ -48,7 +48,6 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 @property(nonatomic, assign) BOOL entableAnimation;
 /**&lt; 打开拖拽手势 defult NO */
 @property(nonatomic, assign) BOOL entablePanGestureRecognizer;
-
 /**&lt; 背景 */
 @property(nonatomic, weak) UIView *backgroundView;
 

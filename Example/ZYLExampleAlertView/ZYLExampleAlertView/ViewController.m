@@ -8,6 +8,43 @@
 
 #import "ViewController.h"
 #import <ZYLCustomAlertView/ZYLCustomAlertView.h>
+@interface ZYLDemoInputView : UIView<ZYLCustomInputView>
+@property(nonatomic, strong) UITextView *textView;
+- (void)inputViewBecomeFirstResponder;
+- (void)inputViewResignFirstResponder;
+@end
+
+@implementation ZYLDemoInputView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    if(self = [super initWithFrame:frame]) {
+        self.backgroundColor = [UIColor purpleColor];
+        UITextView *textView = [[UITextView alloc] init];
+        [self addSubview:textView];
+        
+        textView.translatesAutoresizingMaskIntoConstraints = NO;
+        
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[textView]-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(textView)]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[textView]-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(textView)]];
+        
+        _textView = textView;
+    }
+    return self;
+}
+
+- (void)inputViewBecomeFirstResponder
+{
+    [_textView becomeFirstResponder];
+}
+
+- (void)inputViewResignFirstResponder
+{
+    [_textView resignFirstResponder];
+}
+
+@end
+
 @interface ViewController ()<UITableViewDataSource>
 @property(nonatomic, strong) NSArray *datas;
 @end
@@ -17,12 +54,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [[self aCustomButtonWithTitle:@"底部展示" andFrame:CGRectMake(100, 100, 100, 30)] addTarget:self action:@selector(buttonOnClickToAlertBottom:) forControlEvents:UIControlEventTouchUpInside];
-    [[self aCustomButtonWithTitle:@"中间展示" andFrame:CGRectMake(100, 140, 100, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenter:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"底部展示" andFrame:CGRectMake(100, 100, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertBottom:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"中间展示" andFrame:CGRectMake(100, 140, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenter:) forControlEvents:UIControlEventTouchUpInside];
     
-    [[self aCustomButtonWithTitle:@"中间展示（无动画）" andFrame:CGRectMake(100, 180, 160, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"中间展示（无动画）" andFrame:CGRectMake(100, 180, 260, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
+    
+    [[self aCustomButtonWithTitle:@"底部展示InputView" andFrame:CGRectMake(100, 240, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertInputBottom:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"底部展示InputView2" andFrame:CGRectMake(100, 300, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertInput2Bottom:) forControlEvents:UIControlEventTouchUpInside];
     
     self.datas = @[@"", @"", @"", @"", @"", @"", @"", @"", @"", @"", @""];
+    
     
     
     UITapGestureRecognizer *tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapViewToAlert:)];
@@ -42,6 +83,21 @@
     alertView.entablePanGestureRecognizer = YES;
     [alertView show];
     
+}
+
+- (void)buttonOnClickToAlertInputBottom:(id)sender
+{
+    ZYLDemoInputView *inputView = [[ZYLDemoInputView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 200)];
+    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentInputView:inputView];
+    [alertView show];
+}
+
+- (void)buttonOnClickToAlertInput2Bottom:(id)sender
+{
+    ZYLDemoInputView *inputView = [[ZYLDemoInputView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 200)];
+    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentInputView:inputView];
+    alertView.autoBecomeFirstResponder = NO;
+    [alertView show];
 }
 
 
@@ -80,7 +136,7 @@
 - (UIButton *)aCustomButtonWithTitle:(NSString *)title andFrame:(CGRect)frame
 {
     UIButton *button1 = [UIButton buttonWithType:UIButtonTypeCustom];
-    button1.backgroundColor = [UIColor greenColor];
+    button1.backgroundColor = [UIColor blueColor];
     [button1 setTitle:title forState:UIControlStateNormal];
     button1.frame = frame;
     [self.view addSubview:button1];
@@ -89,7 +145,7 @@
 
 - (UIView *)aCustomView
 {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 300)];
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 300)];
 //    UITableView *tableView = [[UITableView alloc] initWithFrame:view.bounds];
 //    [view addSubview:tableView];
 //    tableView.dataSource = self;
@@ -115,3 +171,4 @@
 }
 
 @end
+
