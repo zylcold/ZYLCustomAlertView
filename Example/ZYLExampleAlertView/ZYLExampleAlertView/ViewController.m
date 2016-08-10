@@ -27,6 +27,7 @@
     
     UITapGestureRecognizer *tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapViewToAlert:)];
     [self.view addGestureRecognizer:tapGR];
+
 }
 
 - (void)tapViewToAlert:(UITapGestureRecognizer *)tapGR
