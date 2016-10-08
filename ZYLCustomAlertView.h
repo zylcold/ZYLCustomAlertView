@@ -31,45 +31,47 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 
 
 @interface ZYLCustomAlertView : NSObject
+
 /**&lt; 展示View 只需设置size  */
 @property(nonatomic, strong) UIView *contentView;
 /**&lt; 带有InputView */
 @property(nonatomic, strong) UIView<ZYLCustomInputView> *contentInputView;
+/**&lt; 展示的位置 defult ZYLShowAlertFromBottom*/
+@property(nonatomic, assign) ZYLShowAlertStyle showStyle;
+/**&lt; 打开拖拽手势 defult NO */
+@property(nonatomic, assign) BOOL entablePanGestureRecognizer;
+/**&lt; 偏移量 */
+@property(nonatomic, assign) CGPoint offset; //未实现
+
 
 /**&lt; 背景 defult [UIColor red:0 green:0 blue:0 alpha:0.5]; */
 @property(nonatomic, strong) UIColor *backgroundColor;
-/**&lt; 展示的位置 defult ZYLShowAlertFromBottom*/
-@property(nonatomic, assign) ZYLShowAlertStyle showStyle;
 /**&lt; 点击其他区域是否隐藏 defult Yes */
 @property(nonatomic, assign) BOOL entableTapDismiss;
-/**&lt; 隐藏时的操作 */
-@property(nonatomic, copy) void(^tapDismissHandle)(void);
-/**&lt; 打开动画 defult YES*/
-@property(nonatomic, assign) BOOL entableAnimation;
-/**&lt; 打开拖拽手势 defult NO */
-@property(nonatomic, assign) BOOL entablePanGestureRecognizer;
 /**&lt; 背景 */
 @property(nonatomic, weak) UIView *backgroundView;
-
-@property(nonatomic, assign) CGPoint offset; //未实现
 /**&lt; 自动成为响应者 defult YES */
 @property (nonatomic, assign) BOOL autoBecomeFirstResponder;
+/**&lt; 打开动画 defult YES*/
+@property(nonatomic, assign) BOOL entableAnimation;
+
+/**&lt; 隐藏时的操作 */
+@property(nonatomic, copy) void(^tapDismissHandle)(void);
 
 - (instancetype)initWithContentView:(UIView *)contentView;
 
 - (instancetype)initWithContentInputView:(UIView<ZYLCustomInputView> *)contentView;
-
-/**&lt; 使用默认方式展示一个自定义View */
-+ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position;
-
-/**&lt; 使用默认方式展示一个自定义View */
-+ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
 
 /**&lt; 展示 */
 - (void)show;
 
 /**&lt; 隐藏 */
 - (void)dismissSheetView;
+
+/**&lt; 使用默认方式展示一个自定义View */
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position;
+/**&lt; 使用默认方式展示一个自定义View */
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
 
 @end
 

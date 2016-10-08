@@ -10,43 +10,30 @@ Pod::Spec.new do |s|
   s.summary      = "CustomAlertView"
 
   s.description  = <<-DESC
-                   CustomAlertView
+                   This is a CustomAlertView, That can Show a Custom View with animation.
+                   Supported Bottom, Center to Show.
                    DESC
 
   s.homepage     = "https://github.com/zylcold"
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.license      = "MIT"
-  # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
+  s.license      = { :type => "MIT", :file => "LICENSE" }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.author             = { "zylcold" => "707889716@qq.com" }
-  # Or just: s.author    = "zylcold"
-  # s.authors            = { "zylcold" => "707889716@qq.com" }
-  # s.social_media_url   = "http://twitter.com/zylcold"
+  s.author             = { "zylcold" => "zylcold@163.com" }
+  s.social_media_url   = "https://zylcold.github.io"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-
-  # s.platform     = :ios
   s.platform     = :ios, "7.0"
-
-  #  When using multiple platforms
-  # s.ios.deployment_target = "7.0"
-  # s.osx.deployment_target = "10.7"
-
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source       = { :git => "https://github.com/zylcold/ZYLCustomAlertView.git", :tag => s.version }
 
-
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.source_files  = "ZYLCustomAlertView.{h,m}"
-  #  s.exclude_files = "Classes/Exclude"
-
-  # s.public_header_files = "Classes/**/*.h"
-
+  s.ios.framework  = 'UIKit'
 
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
