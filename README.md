@@ -2,7 +2,17 @@
 
 ## CocoaPod
 
-  pod 'ZYLCustomAlertView', :git => 'https://github.com/zylcold/ZYLCustomAlertView.git'
+  pod 'ZYLCustomAlertView'
+
+## 
+
+## Run Example
+
+	cd ./Example/ZYLExampleAlertView
+
+	pod install
+
+	open ZYLExampleAlertView.xcworkspace
   
 ## License
 

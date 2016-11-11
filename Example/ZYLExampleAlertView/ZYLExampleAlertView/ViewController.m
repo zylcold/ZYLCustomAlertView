@@ -127,6 +127,7 @@
 {
     ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] init];
     alertView.contentView = [self aCustomView];
+    alertView.offset = CGPointMake(0, 50);
     alertView.showStyle = ZYLShowAlertFromCenter;
     alertView.entablePanGestureRecognizer = YES;
     [alertView show];

@@ -8,7 +8,9 @@
 
 #import "ZYLCustomAlertView.h"
 static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAnimation";
+
 @interface ZYLCustomAlertToolsView : UIView<UIGestureRecognizerDelegate>
+
 @property(nonatomic, weak) UITapGestureRecognizer *tapGR;
 @property(nonatomic, weak) UIPanGestureRecognizer *panGR;
 @property(nonatomic, weak) UIView *backgroundView_p;
@@ -20,38 +22,51 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 @property(nonatomic, copy) void(^tapDismissHandle)(void);
 @property(nonatomic, assign) CGPoint offset;
 @property(nonatomic, assign) BOOL entableAnimation;
-@property (nonatomic, assign) BOOL autoBecomeFirstResponder;
+@property(nonatomic, assign) BOOL autoBecomeFirstResponder;
 @property(nonatomic, assign) BOOL entablePanGestureRecognizer;
 @property(nonatomic, assign) BOOL panToDismiss;
 @property(nonatomic, strong) UIView *contentView_p;
 @property(nonatomic, strong) ZYLCustomAlertView *tools;
 @property(nonatomic, assign) CGPoint transformBegan;
-@property (nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
+@property(nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
 
-@property (nonatomic, assign) ZYLAlertCompass compass;
+@property(nonatomic, assign) ZYLAlertCompass compass;
+
+@property(nonatomic, strong) UIView *toAddView;
 
 - (void)show;
 - (void)dismissSheetView;
 @end
 @implementation ZYLCustomAlertToolsView
 
-- (instancetype)initWithFrame:(CGRect)frame
+- (instancetype)initWithAddView:(UIView *)view
 {
-    if(self = [super initWithFrame:frame]) {
-        [self p_setupCustomView];
+    if(self = [super initWithFrame:view.bounds]) {
+        [self p_setupCustomViewWithAddView:view];
     }
+    
     return self;
 }
 
-- (void)p_setupCustomView
+- (void)dealloc
 {
-    UIWindow *keyWindow = [self keyWindow_p];
-    [keyWindow.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.contentView_p.layer removeAllAnimations];
+}
+
+- (void)p_setupCustomViewWithAddView:(UIView *)view
+{
+    if(view) {
+        self.toAddView = view;
+    }else {
+        self.toAddView = [self keyWindow_p];
+    }
+    [self.toAddView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if([obj isKindOfClass:[self class]]) {
             [obj removeFromSuperview];
         }
     }];
-    self.frame = CGRectMake(0, 0, keyWindow.frame.size.width, keyWindow.frame.size.height);
+    self.frame = CGRectMake(0, 0, self.toAddView.frame.size.width, self.toAddView.frame.size.height);
     self.backgroundColor = [UIColor clearColor];
     //背景View
     UIView *backgroundView = [[UIView alloc] init];
@@ -71,102 +86,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     self.keyboardShow = NO;
     self.panToDismiss = NO;
 }
-//获取App KeyWindow
-- (UIWindow *)keyWindow_p
-{
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    if([[UIApplication sharedApplication].delegate respondsToSelector:@selector(window)]) {
-        if([[UIApplication sharedApplication].delegate window].keyWindow) {
-            keyWindow = [[UIApplication sharedApplication].delegate window];
-        }
-    }
-    return keyWindow;
-}
 
-//点击展示View之外区域操作
-- (void)tapToDismissSheetView:(UITapGestureRecognizer *)tapGR
-{
-    if(!CGRectContainsPoint(self.contentView_p.frame, [tapGR locationInView:self])) {
-        [self tapTodismissSheetView];
-    }
-}
-
-- (void)panToSheetView:(UIPanGestureRecognizer *)panGR
-{
-
-    switch (self.showStyle) {
-        case ZYLShowAlertFromBottom:
-        case ZYLShowAlertFromCenter:
-            [self handldPanGRForNoShowCustom:panGR];
-            break;
-        case ZYLShowAlertFromCustom:
-            [self handldPanGRForShowCustom:panGR];
-            break;
-    }
-}
-
-
-- (void)handldPanGRForShowCustom:(UIPanGestureRecognizer *)panGR
-{
-//    switch (panGR.state) {
-//        case UIGestureRecognizerStateBegan:{
-//            _transformBegan =  [panGR translationInView: self.contentView_p];
-//            break;
-//        }
-//        case UIGestureRecognizerStateChanged:{
-//            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
-//            CGFloat transformY = transformChanged.y-_transformBegan.y;
-//            switch (self.compass) {
-//                case ZYLAlertCompassForTop | ZYLAlertCompassForCenter:
-//                case ZYLAlertCompassForTop | ZYLAlertCompassForLeft:
-//                case ZYLAlertCompassForTop | ZYLAlertCompassForRight:{
-//                    if(transformY >= 0) {
-//                        
-//                    }
-//                    break;
-//                }
-//                case ZYLAlertCompassForBottom | ZYLAlertCompassForCenter:
-//                case ZYLAlertCompassForBottom | ZYLAlertCompassForLeft:
-//                case ZYLAlertCompassForBottom | ZYLAlertCompassForRight:{
-//            
-//                    CGFloat progress = ((300-_transformBegan.y) + transformY) / (300-_transformBegan.y);
-//                    if(CGRectGetHeight(self.contentView_p.frame) / 300 >= 0.2 && progress > 0 && progress < 1) {
-//                        NSLog(@"%f", progress);
-//                        [UIView animateWithDuration:0.1 animations:^{
-//                            self.contentView_p.transform = CGAffineTransformMakeScale(progress, progress);
-//                        }];
-//                    }else if(CGRectGetHeight(self.contentView_p.frame) / 300 < 0.2){
-//                        self.panToDismiss = YES;
-//                        [self dismissSheetView];
-//                    }
-//                    break;
-//                }
-//                default:
-//                    break;
-//            }
-//            break;
-//        }
-//        case UIGestureRecognizerStateEnded:{
-//            CGPoint transformChanged =  [panGR translationInView: self];
-//            CGFloat transformY = transformChanged.y-_transformBegan.y;
-//            if(ABS(transformY) > 0.3 * CGRectGetHeight(self.contentView_p.frame)) {
-//                self.panToDismiss = YES;
-//                [self dismissSheetView];
-//            }else {
-//                [UIView animateWithDuration:0.15 animations:^{
-//                    self.contentView_p.transform = CGAffineTransformIdentity;
-//                }];
-//            }
-//            
-//        }
-//        default:{
-//            [UIView animateWithDuration:0.15 animations:^{
-//                self.contentView_p.transform = CGAffineTransformIdentity;
-//            }];
-//            break;
-//        }
-//    }
-}
 
 - (void)handldPanGRForNoShowCustom:(UIPanGestureRecognizer *)panGR
 {
@@ -216,6 +136,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     self.tapGR.enabled = entableTapDismiss;
 }
 
+
 - (void)show
 {
     NSAssert(self.contentView_p, @"must have contentView");
@@ -243,143 +164,22 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }
     
     
-    UIWindow *keyWindow = [self keyWindow_p];
-    [keyWindow addSubview:self];
+    [self.toAddView addSubview:self];
     [self addSubview: self.contentView_p];
     
     UIView *contentView = self.contentView_p;
     contentView.translatesAutoresizingMaskIntoConstraints = NO;
     switch (_showStyle) {
         case ZYLShowAlertFromBottom:{
-            
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[contentView(%f)]-(-%f)-|", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
-            
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[contentView(%f)]", CGRectGetWidth(contentView.frame)] options:NSLayoutFormatAlignAllCenterX metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
-            
-            //X轴居中显示
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
-            
-            //更新约束，确定原始位置
-            [self updateConstraints];
-            [self layoutIfNeeded];
-            
-            
-            if(self.contentView) {
-                [self finderBottomConstraintForView:contentView].constant = 0;
-                //更新约束，添加动画
-                [UIView animateWithDuration:0.25 animations:^{
-                    [self updateConstraints];
-                    [self layoutIfNeeded];
-                    _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-                }];
-            }else if(self.contentInputView){
-                
-                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handldNotification:) name:UIKeyboardWillChangeFrameNotification object:nil];
-                
-                if(self.autoBecomeFirstResponder) {
-                    [self.contentInputView inputViewBecomeFirstResponder];
-                    [UIView animateWithDuration:0.25 animations:^{
-                        _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-                    }];
-                }else {
-                    [self finderBottomConstraintForView:contentView].constant = 0;
-                    //更新约束，添加动画
-                    [UIView animateWithDuration:0.25 animations:^{
-                        [self updateConstraints];
-                        [self layoutIfNeeded];
-                        _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-                    }];
-                }
-                
-                
-            }
+            [self handldShowForBottomWithContentView:contentView];
             break;
         }
-            
         case ZYLShowAlertFromCenter:{
-            
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[superview]-(<=1)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:@{@"width" : @(CGRectGetWidth(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
-            
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
-            
-            
-            if(self.entableAnimation) {
-                [self.contentView_p.layer addAnimation:[self transfromAnimation] forKey:@"hhh"];
-                [UIView animateWithDuration:0.25 animations:^{
-                    _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-                }];
-            }else {
-                _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-            }
-            
+            [self handldShowForCenterWithContentView:contentView];
             break;
         }
         case ZYLShowAlertFromCustom:{
-            CGFloat screenW = CGRectGetWidth([self mainScreen]);
-            CGFloat contentViewX = CGRectGetMinX(contentView.frame);
-            CGFloat contentViewY = CGRectGetMinY(contentView.frame);
-            CGFloat contentViewH = CGRectGetHeight(contentView.frame);
-            CGFloat contentViewW = CGRectGetWidth(contentView.frame);
-            CGFloat contentMarginL = contentViewX;
-            CGFloat contentMarginR = screenW-CGRectGetMaxX(contentView.frame);
-            CGFloat contentMarginT = contentViewY;
-            
-            CGFloat viewX = 0;
-            CGFloat viewY = 0;
-            if(contentMarginT >= contentViewH) {  //上面
-                if(contentMarginL >= contentViewW / 2  && contentMarginR >= -contentViewW*0.5) { //中间
-                    contentView.layer.anchorPoint = CGPointMake(0.5, 1);
-                    viewX = contentViewX - contentViewW * .5;
-                    viewY = contentViewY - contentViewH * .5;
-                    self.compass = ZYLAlertCompassForTop | ZYLAlertCompassForCenter;
-                }else {
-                    if(contentMarginL < contentViewW / 2) { //右上
-                        contentView.layer.anchorPoint = CGPointMake(0, 1);
-                        viewX = contentViewX-contentViewW * .5;
-                        viewY = contentViewY-contentViewH * .5;
-                        self.compass = ZYLAlertCompassForRight | ZYLAlertCompassForTop;
-                    }else { //左上
-                        contentView.layer.anchorPoint = CGPointMake(1, 1);
-                        viewX = contentViewX-contentViewW*.5;
-                        viewY = contentViewY-contentViewH*.5;
-                        self.compass = ZYLAlertCompassForTop | ZYLAlertCompassForLeft;
-                    }
-                }
-            }else {
-                if(contentMarginL >= contentViewW / 2  && contentMarginR >= -contentViewW*0.5) { //中间
-                    contentView.layer.anchorPoint = CGPointMake(0.5, 0);
-                    viewX = contentViewX-contentViewW*.5;
-                    viewY = contentViewY-contentViewH*.5;
-                    self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForCenter;
-                }else {
-                    if(contentMarginL < contentViewW / 2) { //右下
-                        contentView.layer.anchorPoint = CGPointMake(0, 0);
-                        viewX = contentViewX-contentViewW*.5;
-                        viewY = contentViewY-contentViewH*.5;
-                        self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForRight;
-                    }else { //左下
-                        contentView.layer.anchorPoint = CGPointMake(1, 0);
-                        viewX = contentViewX-contentViewW*.5;
-                        viewY = contentViewY-contentViewH*.5;
-                        self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForLeft;
-                    }
-                }
-            }
-            
-            NSDictionary *metricsDict = @{@"width" : @(contentViewW), @"height" : @(contentViewH), @"viewX" : @(viewX), @"viewY" : @(viewY)};
-            NSDictionary *viewDict = NSDictionaryOfVariableBindings(contentView);
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(viewX)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:metricsDict views:viewDict]];
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(viewY)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:metricsDict views:viewDict]];
-            
-            if(self.entableAnimation) {
-                [contentView.layer addAnimation:[self transfromAnimation] forKey:@"hhhh"];
-                [UIView animateWithDuration:0.15 animations:^{
-                    _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-                }];
-            }else {
-                _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-            }
-           
+            [self handldShowForCustomWithContentView:contentView];
             break;
         }
         default:
@@ -387,42 +187,149 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }
 }
 
-//获取展示区域的大小
-- (CGRect)mainScreen
-{
-    return [UIScreen mainScreen].bounds;
-}
 
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self.contentView_p.layer removeAllAnimations];
-}
 
-- (void)handldNotification:(NSNotification *)notifacation
+- (void)handldShowForBottomWithContentView:(UIView *)contentView
 {
-    NSDictionary *userInfo = notifacation.userInfo;
-    CGRect beginR = [userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
-    CGRect endR = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
-    CGFloat duration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
-    UIViewAnimationCurve curve = [userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[contentView(%f)]-(-%f)-|", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
     
-    if(beginR.origin.y == [UIScreen mainScreen].bounds.size.height) {
-        self.keyboardShow = YES;
-        [self showEditView:self.contentView_p withHeight:endR.size.height];
-    }else if(endR.origin.y == [UIScreen mainScreen].bounds.size.height) {
-        [self dismissEditView:self.contentView_p andHeight:CGRectGetHeight(self.contentView_p.frame)];
-    }else {
-        self.keyboardShow = YES;
-        [self showEditView:self.contentView_p withHeight:endR.size.height];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[contentView(%f)]", CGRectGetWidth(contentView.frame)] options:NSLayoutFormatAlignAllCenterX metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
+    
+    //X轴居中显示
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
+    
+    //更新约束，确定原始位置
+    [self updateConstraints];
+    [self layoutIfNeeded];
+    
+    
+    if(self.contentView) {
+        [self finderBottomConstraintForView:contentView].constant = 0;
+        //更新约束，添加动画
+        [UIView animateWithDuration:0.25 animations:^{
+            [self updateConstraints];
+            [self layoutIfNeeded];
+            _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+        }];
+    }else if(self.contentInputView){
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handldNotification:) name:UIKeyboardWillChangeFrameNotification object:nil];
+        
+        if(self.autoBecomeFirstResponder) {
+            [self.contentInputView inputViewBecomeFirstResponder];
+            [UIView animateWithDuration:0.25 animations:^{
+                _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+            }];
+        }else {
+            [self finderBottomConstraintForView:contentView].constant = 0;
+            //更新约束，添加动画
+            [UIView animateWithDuration:0.25 animations:^{
+                [self updateConstraints];
+                [self layoutIfNeeded];
+                _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+            }];
+        }
+        
     }
     
-    void(^animations)() = ^{
-        [self updateConstraints];
-        [self layoutIfNeeded];
-    };
-    [UIView animateWithDuration:duration delay:0.0f options:(curve << 16 | UIViewAnimationOptionBeginFromCurrentState) animations:animations completion:nil];
 }
+
+- (void)handldShowForCenterWithContentView:(UIView *)contentView
+{
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[superview]-(<=1)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:@{@"width" : @(CGRectGetWidth(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
+    [contentView addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:CGRectGetWidth(contentView.frame)]];
+    
+    [contentView addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:CGRectGetHeight(contentView.frame)]];
+    
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1 constant:self.offset.y]];
+    
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterX multiplier:1 constant:self.offset.x]];
+    
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
+    
+    
+    if(self.entableAnimation) {
+        [self.contentView_p.layer addAnimation:[self transfromAnimation] forKey:@"hhh"];
+        [UIView animateWithDuration:0.25 animations:^{
+            _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+        }];
+    }else {
+        _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+    }
+}
+
+- (void)handldShowForCustomWithContentView:(UIView *)contentView
+{
+    CGFloat screenW = CGRectGetWidth([self mainScreen]);
+    CGFloat contentViewX = CGRectGetMinX(contentView.frame);
+    CGFloat contentViewY = CGRectGetMinY(contentView.frame);
+    CGFloat contentViewH = CGRectGetHeight(contentView.frame);
+    CGFloat contentViewW = CGRectGetWidth(contentView.frame);
+    CGFloat contentMarginL = contentViewX;
+    CGFloat contentMarginR = screenW-CGRectGetMaxX(contentView.frame);
+    CGFloat contentMarginT = contentViewY;
+    
+    CGFloat viewX = 0;
+    CGFloat viewY = 0;
+    if(contentMarginT >= contentViewH) {  //上面
+        if(contentMarginL >= contentViewW / 2  && contentMarginR >= -contentViewW*0.5) { //中间
+            contentView.layer.anchorPoint = CGPointMake(0.5, 1);
+            viewX = contentViewX - contentViewW * .5;
+            viewY = contentViewY - contentViewH * .5;
+            self.compass = ZYLAlertCompassForTop | ZYLAlertCompassForCenter;
+        }else {
+            if(contentMarginL < contentViewW / 2) { //右上
+                contentView.layer.anchorPoint = CGPointMake(0, 1);
+                viewX = contentViewX-contentViewW * .5;
+                viewY = contentViewY-contentViewH * .5;
+                self.compass = ZYLAlertCompassForRight | ZYLAlertCompassForTop;
+            }else { //左上
+                contentView.layer.anchorPoint = CGPointMake(1, 1);
+                viewX = contentViewX-contentViewW*.5;
+                viewY = contentViewY-contentViewH*.5;
+                self.compass = ZYLAlertCompassForTop | ZYLAlertCompassForLeft;
+            }
+        }
+    }else {
+        if(contentMarginL >= contentViewW / 2  && contentMarginR >= -contentViewW*0.5) { //中间
+            contentView.layer.anchorPoint = CGPointMake(0.5, 0);
+            viewX = contentViewX-contentViewW*.5;
+            viewY = contentViewY-contentViewH*.5;
+            self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForCenter;
+        }else {
+            if(contentMarginL < contentViewW / 2) { //右下
+                contentView.layer.anchorPoint = CGPointMake(0, 0);
+                viewX = contentViewX-contentViewW*.5;
+                viewY = contentViewY-contentViewH*.5;
+                self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForRight;
+            }else { //左下
+                contentView.layer.anchorPoint = CGPointMake(1, 0);
+                viewX = contentViewX-contentViewW*.5;
+                viewY = contentViewY-contentViewH*.5;
+                self.compass = ZYLAlertCompassForBottom | ZYLAlertCompassForLeft;
+            }
+        }
+    }
+    
+    NSDictionary *metricsDict = @{@"width" : @(contentViewW), @"height" : @(contentViewH), @"viewX" : @(viewX), @"viewY" : @(viewY)};
+    NSDictionary *viewDict = NSDictionaryOfVariableBindings(contentView);
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(viewX)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:metricsDict views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(viewY)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:metricsDict views:viewDict]];
+    
+    if(self.entableAnimation) {
+        [contentView.layer addAnimation:[self transfromAnimation] forKey:@"hhhh"];
+        [UIView animateWithDuration:0.15 animations:^{
+            _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+        }];
+    }else {
+        _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+    }
+    
+}
+
+
+
+
 
 - (void)tapTodismissSheetView
 {
@@ -491,60 +398,19 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         case ZYLShowAlertFromCustom:{
             if(self.entableAnimation) {
                 [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
+                [UIView animateWithDuration:0.25 animations:^{
+                    _backgroundView_p.backgroundColor = [UIColor clearColor];
+                } completion:finishedHandld];
+            }else {
+                finishedHandld(YES);
             }
-            [UIView animateWithDuration:0.25 animations:^{
-                _backgroundView_p.backgroundColor = [UIColor clearColor];
-            } completion:finishedHandld];
+            
             break;
         }
             
     }
 }
 
-- (CABasicAnimation *)dismissTransfromAnimation
-{
-    CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    fooAnimation.fromValue = @(1);
-    fooAnimation.duration = 0.1;
-    fooAnimation.toValue = @(0);
-    fooAnimation.fillMode = kCAFillModeForwards;
-    fooAnimation.removedOnCompletion = NO;
-    fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.84 :.14 :.95 :0.42];
-    return fooAnimation;
-}
-
-- (CABasicAnimation *)dismissTransfromTranslateAnimation
-{
-    CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.translation.y"];
-    fooAnimation.duration = 0.25;
-    fooAnimation.toValue = @([self mainScreen].size.height-CGRectGetMinX(self.contentView_p.frame));
-    fooAnimation.fillMode = kCAFillModeForwards;
-    fooAnimation.removedOnCompletion = NO;
-    return fooAnimation;
-}
-- (CAAnimation *)transfromAnimation
-{
-    if([UIDevice currentDevice].systemVersion.floatValue >= 9.0) {
-        CASpringAnimation *spring = [CASpringAnimation animationWithKeyPath:@"transform.scale"];
-        spring.damping = 20;
-        spring.stiffness = 120;
-        spring.mass = 1.2;
-        spring.initialVelocity = 15;
-        spring.fromValue = @(0);
-        spring.toValue = @(1);
-        spring.duration = spring.settlingDuration;
-        return spring;
-    }else {
-        CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-        fooAnimation.fromValue = @(0);
-        fooAnimation.duration = 0.25;
-        fooAnimation.toValue = @(1);
-        fooAnimation.fillMode = kCAFillModeForwards;
-        fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.03 :.54 :.07 :0.98];
-        fooAnimation.removedOnCompletion = NO;
-        return fooAnimation;
-    }
-}
 
 - (void)setContentView:(UIView *)contentView
 {
@@ -580,6 +446,30 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     return temConstraint;
 }
 
+
+//MARK: 处理监听回调
+//点击展示View之外区域操作
+- (void)tapToDismissSheetView:(UITapGestureRecognizer *)tapGR
+{
+    if(!CGRectContainsPoint(self.contentView_p.frame, [tapGR locationInView:self])) {
+        [self tapTodismissSheetView];
+    }
+}
+
+- (void)panToSheetView:(UIPanGestureRecognizer *)panGR
+{
+    
+    switch (self.showStyle) {
+        case ZYLShowAlertFromBottom:
+        case ZYLShowAlertFromCenter:
+            [self handldPanGRForNoShowCustom:panGR];
+            break;
+        case ZYLShowAlertFromCustom:
+            //            [self handldPanGRForShowCustom:panGR];
+            break;
+    }
+}
+
 //同时响应多个手势
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
@@ -598,9 +488,95 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     return NO;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+- (void)handldNotification:(NSNotification *)notifacation
 {
-    NSLog(@"%@", change);
+    NSDictionary *userInfo = notifacation.userInfo;
+    CGRect beginR = [userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+    CGRect endR = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    CGFloat duration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
+    UIViewAnimationCurve curve = [userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+    
+    if(beginR.origin.y == [UIScreen mainScreen].bounds.size.height) {
+        self.keyboardShow = YES;
+        [self showEditView:self.contentView_p withHeight:endR.size.height];
+    }else if(endR.origin.y == [UIScreen mainScreen].bounds.size.height) {
+        [self dismissEditView:self.contentView_p andHeight:CGRectGetHeight(self.contentView_p.frame)];
+    }else {
+        self.keyboardShow = YES;
+        [self showEditView:self.contentView_p withHeight:endR.size.height];
+    }
+    
+    void(^animations)() = ^{
+        [self updateConstraints];
+        [self layoutIfNeeded];
+    };
+    [UIView animateWithDuration:duration delay:0.0f options:(curve << 16 | UIViewAnimationOptionBeginFromCurrentState) animations:animations completion:nil];
+}
+
+
+
+//MARK: 获取
+//获取App KeyWindow
+- (UIWindow *)keyWindow_p
+{
+    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+    if([[UIApplication sharedApplication].delegate respondsToSelector:@selector(window)]) {
+        if([[UIApplication sharedApplication].delegate window].keyWindow) {
+            keyWindow = [[UIApplication sharedApplication].delegate window];
+        }
+    }
+    return keyWindow;
+}
+
+//获取展示区域的大小
+- (CGRect)mainScreen
+{
+    return self.toAddView.bounds;
+}
+//MARK: 获取动画效果
+- (CABasicAnimation *)dismissTransfromAnimation
+{
+    CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    fooAnimation.fromValue = @(1);
+    fooAnimation.duration = 0.1;
+    fooAnimation.toValue = @(0);
+    fooAnimation.fillMode = kCAFillModeForwards;
+    fooAnimation.removedOnCompletion = NO;
+    fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.84 :.14 :.95 :0.42];
+    return fooAnimation;
+}
+
+- (CABasicAnimation *)dismissTransfromTranslateAnimation
+{
+    CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.translation.y"];
+    fooAnimation.duration = 0.25;
+    fooAnimation.toValue = @([self mainScreen].size.height-CGRectGetMinX(self.contentView_p.frame));
+    fooAnimation.fillMode = kCAFillModeForwards;
+    fooAnimation.removedOnCompletion = NO;
+    return fooAnimation;
+}
+- (CAAnimation *)transfromAnimation
+{
+    if([UIDevice currentDevice].systemVersion.floatValue >= 9.0) {
+        CASpringAnimation *spring = [CASpringAnimation animationWithKeyPath:@"transform.scale"];
+        spring.damping = 80;
+        spring.stiffness = 230;
+        spring.mass = 1.2;
+        spring.initialVelocity = 20;
+        spring.fromValue = @(0);
+        spring.toValue = @(1);
+        spring.duration = spring.settlingDuration;
+        return spring;
+    }else {
+        CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+        fooAnimation.fromValue = @(0);
+        fooAnimation.duration = 0.25;
+        fooAnimation.toValue = @(1);
+        fooAnimation.fillMode = kCAFillModeForwards;
+        fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.03 :.54 :.07 :0.98];
+        fooAnimation.removedOnCompletion = NO;
+        return fooAnimation;
+    }
 }
 
 @end
@@ -614,8 +590,13 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 @implementation ZYLCustomAlertView
 - (instancetype)initWithContentView:(UIView *)contentView
 {
+    return [self initWithContentView:contentView addedTo:nil];
+}
+
+- (instancetype)initWithContentView:(UIView *)contentView addedTo:(UIView *)view
+{
     if(self = [super init]) {
-        [self p_setUp];
+        [self p_setUpWithAddView:view];
         self.customAlertView.contentView = contentView;
     }
     return self;
@@ -624,7 +605,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (instancetype)initWithContentInputView:(UIView<ZYLCustomInputView> *)contentView
 {
     if(self = [super init]) {
-        [self p_setUp];
+        [self p_setUpWithAddView:nil];
         self.customAlertView.contentInputView = contentView;
         
     }
@@ -634,14 +615,14 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (instancetype)init
 {
     if(self = [super init]) {
-        [self p_setUp];
+        [self p_setUpWithAddView:nil];
     }
     return self;
 }
 
-- (void)p_setUp
+- (void)p_setUpWithAddView:(UIView *)addView
 {
-    self.customAlertView = [[ZYLCustomAlertToolsView alloc] init];
+    self.customAlertView = [[ZYLCustomAlertToolsView alloc] initWithAddView:addView];
     self.customAlertView.tools = self;
     //设置默认属性
     self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -739,5 +720,12 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     return alertView;
 }
 
-@end
++ (instancetype)showCustomView:(UIView *)customView addedTo:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton
+{
+    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:view addedTo:view];
+    alertView.showStyle = position;
+    alertView.entableAnimation = animaton;
+    return alertView;
+}
 
+@end

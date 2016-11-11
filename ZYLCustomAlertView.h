@@ -41,8 +41,7 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 /**&lt; 打开拖拽手势 defult NO */
 @property(nonatomic, assign) BOOL entablePanGestureRecognizer;
 /**&lt; 偏移量 */
-@property(nonatomic, assign) CGPoint offset; //未实现
-
+@property(nonatomic, assign) CGPoint offset; //ZYLShowAlertFromCenter only
 
 /**&lt; 背景 defult [UIColor red:0 green:0 blue:0 alpha:0.5]; */
 @property(nonatomic, strong) UIColor *backgroundColor;
@@ -60,7 +59,18 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 
 - (instancetype)initWithContentView:(UIView *)contentView;
 
+- (instancetype)initWithContentView:(UIView *)contentView addedTo:(UIView *)view;
+
 - (instancetype)initWithContentInputView:(UIView<ZYLCustomInputView> *)contentView;
+
+/**&lt; 使用默认方式展示一个自定义View */
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position;
+/**&lt; 使用默认方式展示一个自定义View */
++ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
+
+/**&lt; 使用默认方式展示一个自定义View */
++ (instancetype)showCustomView:(UIView *)customView addedTo:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
+
 
 /**&lt; 展示 */
 - (void)show;
@@ -68,10 +78,7 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 /**&lt; 隐藏 */
 - (void)dismissSheetView;
 
-/**&lt; 使用默认方式展示一个自定义View */
-+ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position;
-/**&lt; 使用默认方式展示一个自定义View */
-+ (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
+
 
 @end
 
