@@ -6,7 +6,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "ZYLCustomAlertView"
-  s.version      = "0.0.6"
+  s.version      = "0.0.7"
   s.summary      = "CustomAlertView"
 
   s.description  = <<-DESC
