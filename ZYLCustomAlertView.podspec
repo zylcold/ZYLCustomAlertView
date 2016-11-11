@@ -6,7 +6,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "ZYLCustomAlertView"
-  s.version      = "0.0.4"
+  s.version      = "0.0.6"
   s.summary      = "CustomAlertView"
 
   s.description  = <<-DESC
@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/zylcold"
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.license      = { :type => "MIT", :file => "LICENSE" }
+  s.license      = { :type => "MIT", :file => "./LICENSE" }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
