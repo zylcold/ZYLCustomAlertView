@@ -1,5 +1,5 @@
 PODS:
-  - ZYLCustomAlertView (0.0.7)
+  - ZYLCustomAlertView (0.0.9)
 
 DEPENDENCIES:
   - ZYLCustomAlertView (from `../../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: ../../
 
 SPEC CHECKSUMS:
-  ZYLCustomAlertView: 1fe2f7ceb8a8406b68110c3eaea04e4df4e813a5
+  ZYLCustomAlertView: c1bbfed8bdf8cf2c75a95571bdda53e91b4f2176
 
 PODFILE CHECKSUM: 135ef7c251023fd17341f52eb13965396fcf1045
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.1.0.rc.2

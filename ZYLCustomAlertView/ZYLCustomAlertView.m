@@ -526,6 +526,8 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             break;
         case ZYLShowAlertFromCustom:
             break;
+        case ZYLShowAlertFromTop:
+            break;
     }
 }
 
