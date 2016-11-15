@@ -54,16 +54,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [[self aCustomButtonWithTitle:@"底部展示" andFrame:CGRectMake(100, 100, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertBottom:) forControlEvents:UIControlEventTouchUpInside];
-    [[self aCustomButtonWithTitle:@"中间展示" andFrame:CGRectMake(100, 140, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenter:) forControlEvents:UIControlEventTouchUpInside];
-    
-    [[self aCustomButtonWithTitle:@"顶部展示" andFrame:CGRectMake(100, 340, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertTop:) forControlEvents:UIControlEventTouchUpInside];
-    
-    [[self aCustomButtonWithTitle:@"中间展示（无动画）" andFrame:CGRectMake(100, 180, 260, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
-    
-    [[self aCustomButtonWithTitle:@"底部展示InputView" andFrame:CGRectMake(100, 240, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertInputBottom:) forControlEvents:UIControlEventTouchUpInside];
-    [[self aCustomButtonWithTitle:@"底部展示InputView2" andFrame:CGRectMake(100, 300, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertInput2Bottom:) forControlEvents:UIControlEventTouchUpInside];
-    
+    [[self aCustomButtonWithTitle:@"底部展示" andNum:0] addTarget:self action:@selector(buttonOnClickToAlertBottom:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"中间展示" andNum:1] addTarget:self action:@selector(buttonOnClickToAlertCenter:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"顶部展示" andNum:2] addTarget:self action:@selector(buttonOnClickToAlertTop:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"中间展示（无动画）" andNum:3] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"底部展示InputView" andNum:4] addTarget:self action:@selector(buttonOnClickToAlertInputBottom:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"底部展示InputView2" andNum:5] addTarget:self action:@selector(buttonOnClickToAlertInput2Bottom:) forControlEvents:UIControlEventTouchUpInside];
     self.datas = @[@"", @"", @"", @"", @"", @"", @"", @"", @"", @"", @""];
     
     
@@ -117,8 +113,6 @@
     alertView.entableAnimation = NO;
 
     [alertView show];
-    
-//    [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromCenter animaton:NO];
 }
 
 - (void)buttonOnClickToAlertTop:(id)sender
@@ -142,12 +136,13 @@
 }
 
 
-- (UIButton *)aCustomButtonWithTitle:(NSString *)title andFrame:(CGRect)frame
+- (UIButton *)aCustomButtonWithTitle:(NSString *)title andNum:(NSInteger)num
 {
+    
     UIButton *button1 = [UIButton buttonWithType:UIButtonTypeCustom];
     button1.backgroundColor = [UIColor blueColor];
     [button1 setTitle:title forState:UIControlStateNormal];
-    button1.frame = frame;
+    button1.frame = CGRectMake(100, 100 + 40 * num, 200, 30);
     [self.view addSubview:button1];
     return button1;
 }

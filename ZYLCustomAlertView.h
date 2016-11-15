@@ -77,7 +77,7 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 - (void)show;
 
 /**&lt; 隐藏 */
-- (void)dismissSheetView;
+- (void)dismissAlertView;
 
 
 

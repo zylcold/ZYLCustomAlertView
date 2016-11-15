@@ -7,10 +7,11 @@
 //
 
 #import "ZYLCustomAlertView.h"
+
+#import "UIView+YLConstraintHelper.h"
+
 static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAnimation";
-
 @interface ZYLCustomAlertToolsView : UIView<UIGestureRecognizerDelegate>
-
 @property(nonatomic, weak) UITapGestureRecognizer *tapGR;
 @property(nonatomic, weak) UIPanGestureRecognizer *panGR;
 @property(nonatomic, weak) UIView *backgroundView_p;
@@ -35,7 +36,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 @property(nonatomic, strong) UIView *toAddView;
 
 - (void)show;
-- (void)dismissSheetView;
+- (void)dismissAlertView;
 @end
 @implementation ZYLCustomAlertToolsView
 
@@ -61,7 +62,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }else {
         self.toAddView = [self keyWindow_p];
     }
-    [self.toAddView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [self.toAddView.subviews enumerateObjectsUsingBlock:^(UIView *obj, NSUInteger idx, BOOL *stop) {
         if([obj isKindOfClass:[self class]]) {
             [obj removeFromSuperview];
         }
@@ -72,14 +73,15 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     UIView *backgroundView = [[UIView alloc] init];
     [self addSubview:backgroundView];
     backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[backgroundView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(backgroundView)]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[backgroundView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(backgroundView)]];
+    
+    [self yl_addEdgeConstrainToSubview:backgroundView inset:UIEdgeInsetsZero];
+    
     backgroundView.backgroundColor = [UIColor clearColor];
     _backgroundView_p = backgroundView;
     
     
     //点击空白区域 ,消失弹框
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToDismissSheetView:)];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTodismissAlertView:)];
     [backgroundView addGestureRecognizer:tap];
     _tapGR = tap;
     
@@ -110,7 +112,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
             if(transformChanged.y-_transformBegan.y > CGRectGetHeight(self.contentView_p.frame)*.3) {
                 self.panToDismiss = YES;
-                [self dismissSheetView];
+                [self dismissAlertView];
             }else {
                 [UIView animateWithDuration:0.15 animations:^{
                     self.contentView_p.transform = CGAffineTransformIdentity;
@@ -158,8 +160,8 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         
         UIView *teamView = self.contentView_p;
         teamView.translatesAutoresizingMaskIntoConstraints = NO;
-        [contentView_addNib addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[teamView]|" options:0 metrics:0 views:NSDictionaryOfVariableBindings(teamView)]];
-        [contentView_addNib addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[teamView]|" options:0 metrics:0 views:NSDictionaryOfVariableBindings(teamView)]];
+        [contentView_addNib yl_addEdgeConstrainToSubview:teamView inset:UIEdgeInsetsZero];
+        
         self.contentView_p = contentView_addNib;
     }
     
@@ -195,24 +197,22 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 {
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-(-%f)-[contentView(%f)]", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
     
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[contentView(%f)]", CGRectGetWidth(contentView.frame)] options:NSLayoutFormatAlignAllCenterX metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
+    [contentView yl_addOneselfConstrainToWidth:CGRectGetWidth(contentView.frame)];
     
     //X轴居中显示
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
+    [self yl_addCenterXConstrainToSubview:contentView offset:0];
     
     //更新约束，确定原始位置
     [self updateConstraints];
     [self layoutIfNeeded];
     
-    if(self.contentView) {
-        [self finderTopConstraintForView:contentView].constant = 0;
-        //更新约束，添加动画
-        [UIView animateWithDuration:0.25 animations:^{
-            [self updateConstraints];
-            [self layoutIfNeeded];
-            _backgroundView_p.backgroundColor = self.alertBackgroundColor;
-        }];
-    }
+    [self finderTopConstraintForView:contentView].constant = 0;
+    //更新约束，添加动画
+    [UIView animateWithDuration:0.25 animations:^{
+        [self updateConstraints];
+        [self layoutIfNeeded];
+        _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+    }];
 }
 
 
@@ -220,10 +220,8 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 {
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[contentView(%f)]-(-%f)-|", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
     
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[contentView(%f)]", CGRectGetWidth(contentView.frame)] options:NSLayoutFormatAlignAllCenterX metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
-    
-    //X轴居中显示
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
+    [contentView yl_addOneselfConstrainToWidth:CGRectGetWidth(contentView.frame)];
+    [self yl_addCenterXConstrainToSubview:contentView offset:0];
     
     //更新约束，确定原始位置
     [self updateConstraints];
@@ -263,17 +261,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 - (void)handldShowForCenterWithContentView:(UIView *)contentView
 {
-//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[superview]-(<=1)-[contentView(width)]" options:NSLayoutFormatAlignAllCenterY metrics:@{@"width" : @(CGRectGetWidth(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
-    [contentView addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:CGRectGetWidth(contentView.frame)]];
     
-    [contentView addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:CGRectGetHeight(contentView.frame)]];
-    
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1 constant:self.offset.y]];
-    
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:contentView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterX multiplier:1 constant:self.offset.x]];
-    
-//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
-    
+    [contentView yl_addOneselfConstrainToSize:contentView.frame.size];
+    [self yl_addCenterConstrainToSubview:contentView offset:self.offset];
     
     if(self.entableAnimation) {
         [self.contentView_p.layer addAnimation:[self transfromAnimation] forKey:@"hhh"];
@@ -284,6 +274,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         _backgroundView_p.backgroundColor = self.alertBackgroundColor;
     }
 }
+
 
 - (void)handldShowForCustomWithContentView:(UIView *)contentView
 {
@@ -358,12 +349,12 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 
 
-- (void)tapTodismissSheetView
+- (void)tapTodismissAlertView
 {
-    [self.tools dismissSheetView];
+    [self.tools dismissAlertView];
 }
 
-- (void)dismissSheetView
+- (void)dismissAlertView
 {
     void(^finishedHandld)(BOOL finished) = ^(BOOL finished){
         if(finished) {
@@ -374,80 +365,97 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             self.contentView = nil;
             self.contentInputView = nil;
             [self removeFromSuperview];
-
         }
     };
     switch (_showStyle) {
         case ZYLShowAlertFromBottom:{
-            if(self.contentView) {
-                [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
-                [UIView animateWithDuration:0.25 animations:^{
-                    [self updateConstraints];
-                    [self layoutIfNeeded];
-                    _backgroundView_p.backgroundColor = [UIColor clearColor];
-                }completion:finishedHandld];
-            }else if(self.contentInputView) {
-                if(self.isKeyboardShow) {
-                    [self.contentInputView inputViewResignFirstResponder];
-                    [UIView animateWithDuration:0.3 animations:^{
-                        _backgroundView_p.backgroundColor = [UIColor clearColor];
-                    }completion:finishedHandld];
-                }else {
-                    [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
-                    [UIView animateWithDuration:0.25 animations:^{
-                        [self updateConstraints];
-                        [self layoutIfNeeded];
-                        _backgroundView_p.backgroundColor = [UIColor clearColor];
-                    }completion:finishedHandld];
-                }
-            }
-            
+            [self handldDismissFromBottomWithFinish:finishedHandld];
             break;
         }
         case ZYLShowAlertFromCenter:{
-            if(self.entableAnimation) {
-                
-                if(self.panToDismiss) {
-                    [self.contentView_p.layer addAnimation:[self dismissTransfromTranslateAnimation] forKey:kFinishAnimationKey];
-                    [UIView animateWithDuration:0.25 animations:^{
-                        self.backgroundView_p.backgroundColor = [UIColor clearColor];
-                    } completion:finishedHandld];
-                }else {
-                    [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
-                    [UIView animateWithDuration:0.15 animations:^{
-                        _backgroundView_p.backgroundColor = [UIColor clearColor];
-                    } completion:finishedHandld];
-                }
-                
-            }else {
-                finishedHandld(YES);
-            }
-            
+            [self handldDismissFromCenterWithFinish:finishedHandld];
             break;
         }
         case ZYLShowAlertFromCustom:{
-            if(self.entableAnimation) {
-                [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
-                [UIView animateWithDuration:0.25 animations:^{
-                    _backgroundView_p.backgroundColor = [UIColor clearColor];
-                } completion:finishedHandld];
-            }else {
-                finishedHandld(YES);
-            }
-            
+            [self handldDismissFromCustomWithFinish:finishedHandld];
             break;
         }
             
         case ZYLShowAlertFromTop:{
-            [self finderTopConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
+            [self handldDismissFromTopWithFinish:finishedHandld];
+            break;
+        }
+            
+    }
+}
+
+- (void)handldDismissFromTopWithFinish:(void(^)(BOOL))finishedHandld
+{
+    [self finderTopConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
+    [UIView animateWithDuration:0.25 animations:^{
+        [self updateConstraints];
+        [self layoutIfNeeded];
+        _backgroundView_p.backgroundColor = [UIColor clearColor];
+    }completion:finishedHandld];
+}
+
+- (void)handldDismissFromCustomWithFinish:(void(^)(BOOL))finishedHandld
+{
+    if(self.entableAnimation) {
+        [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
+        [UIView animateWithDuration:0.25 animations:^{
+            _backgroundView_p.backgroundColor = [UIColor clearColor];
+        } completion:finishedHandld];
+    }else {
+        finishedHandld(YES);
+    }
+}
+
+- (void)handldDismissFromCenterWithFinish:(void(^)(BOOL))finishedHandld
+{
+    if(self.entableAnimation) {
+        
+        if(self.panToDismiss) {
+            [self.contentView_p.layer addAnimation:[self dismissTransfromTranslateAnimation] forKey:kFinishAnimationKey];
+            [UIView animateWithDuration:0.25 animations:^{
+                self.backgroundView_p.backgroundColor = [UIColor clearColor];
+            } completion:finishedHandld];
+        }else {
+            [self.contentView_p.layer addAnimation:[self dismissTransfromAnimation] forKey:kFinishAnimationKey];
+            [UIView animateWithDuration:0.15 animations:^{
+                _backgroundView_p.backgroundColor = [UIColor clearColor];
+            } completion:finishedHandld];
+        }
+        
+    }else {
+        finishedHandld(YES);
+    }
+
+}
+
+- (void)handldDismissFromBottomWithFinish:(void(^)(BOOL))finishedHandld
+{
+    if(self.contentView) {
+        [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
+        [UIView animateWithDuration:0.25 animations:^{
+            [self updateConstraints];
+            [self layoutIfNeeded];
+            _backgroundView_p.backgroundColor = [UIColor clearColor];
+        }completion:finishedHandld];
+    }else if(self.contentInputView) {
+        if(self.isKeyboardShow) {
+            [self.contentInputView inputViewResignFirstResponder];
+            [UIView animateWithDuration:0.3 animations:^{
+                _backgroundView_p.backgroundColor = [UIColor clearColor];
+            }completion:finishedHandld];
+        }else {
+            [self finderBottomConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
             [UIView animateWithDuration:0.25 animations:^{
                 [self updateConstraints];
                 [self layoutIfNeeded];
                 _backgroundView_p.backgroundColor = [UIColor clearColor];
             }completion:finishedHandld];
-            break;
         }
-            
     }
 }
 
@@ -501,10 +509,10 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 //MARK: 处理监听回调
 //点击展示View之外区域操作
-- (void)tapToDismissSheetView:(UITapGestureRecognizer *)tapGR
+- (void)tapTodismissAlertView:(UITapGestureRecognizer *)tapGR
 {
     if(!CGRectContainsPoint(self.contentView_p.frame, [tapGR locationInView:self])) {
-        [self tapTodismissSheetView];
+        [self tapTodismissAlertView];
     }
 }
 
@@ -517,7 +525,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             [self handldPanGRForNoShowCustom:panGR];
             break;
         case ZYLShowAlertFromCustom:
-            //            [self handldPanGRForShowCustom:panGR];
             break;
     }
 }
@@ -585,6 +592,8 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 {
     return self.toAddView.bounds;
 }
+
+
 //MARK: 获取动画效果
 - (CABasicAnimation *)dismissTransfromAnimation
 {
@@ -716,9 +725,19 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     self.customAlertView.contentView = contentView;
 }
 
+- (UIView *)contentView
+{
+    return self.customAlertView.contentView;
+}
+
 - (void)setContentInputView:(UIView<ZYLCustomInputView> *)contentInputView
 {
     self.customAlertView.contentInputView = contentInputView;
+}
+
+- (UIView<ZYLCustomInputView> *)contentInputView
+{
+    return self.customAlertView.contentInputView;
 }
 
 - (void)setTapDismissHandle:(void (^)(void))tapDismissHandle
@@ -750,9 +769,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     [self.customAlertView show];
 }
 
-- (void)dismissSheetView
+- (void)dismissAlertView
 {
-    [self.customAlertView dismissSheetView];
+    [self.customAlertView dismissAlertView];
     self.customAlertView = nil;
 }
 
