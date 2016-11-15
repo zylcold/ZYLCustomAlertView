@@ -6,7 +6,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "ZYLCustomAlertView"
-  s.version      = "0.0.8"
+  s.version      = "0.0.9"
   s.summary      = "CustomAlertView, That can Show a Custom View with animation."
 
   s.description  = <<-DESC
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.source_files  = "ZYLCustomAlertView.{h,m}"
+  s.source_files  = "ZYLCustomAlertView/*.{h,m}"
   s.ios.framework  = 'UIKit'
 
 
