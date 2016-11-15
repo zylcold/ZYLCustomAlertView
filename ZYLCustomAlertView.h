@@ -17,7 +17,8 @@
 typedef NS_ENUM(NSInteger, ZYLShowAlertStyle) {
     ZYLShowAlertFromBottom,
     ZYLShowAlertFromCenter,
-    ZYLShowAlertFromCustom
+    ZYLShowAlertFromCustom,
+    ZYLShowAlertFromTop
 };
 
 //展示方向

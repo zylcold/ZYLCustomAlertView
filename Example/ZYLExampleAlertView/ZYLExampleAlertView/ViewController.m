@@ -57,6 +57,8 @@
     [[self aCustomButtonWithTitle:@"底部展示" andFrame:CGRectMake(100, 100, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertBottom:) forControlEvents:UIControlEventTouchUpInside];
     [[self aCustomButtonWithTitle:@"中间展示" andFrame:CGRectMake(100, 140, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenter:) forControlEvents:UIControlEventTouchUpInside];
     
+    [[self aCustomButtonWithTitle:@"顶部展示" andFrame:CGRectMake(100, 340, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertTop:) forControlEvents:UIControlEventTouchUpInside];
+    
     [[self aCustomButtonWithTitle:@"中间展示（无动画）" andFrame:CGRectMake(100, 180, 260, 30)] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
     
     [[self aCustomButtonWithTitle:@"底部展示InputView" andFrame:CGRectMake(100, 240, 200, 30)] addTarget:self action:@selector(buttonOnClickToAlertInputBottom:) forControlEvents:UIControlEventTouchUpInside];
@@ -103,10 +105,6 @@
 
 - (void)buttonOnClickToAlertBottom:(id)sender
 {
-//    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:[self aCustomView]];
-//    alertView.showStyle = ZYLShowAlertFromBottom;
-//    [alertView show];
-//    [[[ZYLCustomAlertView alloc] initWithContentView:[self aCustomView]] show];
     ZYLCustomAlertView *alertView = [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromBottom];
     alertView.entablePanGestureRecognizer = YES;
     [alertView show];
@@ -121,6 +119,16 @@
     [alertView show];
     
 //    [ZYLCustomAlertView addCustomView:[self aCustomView] forPosition:ZYLShowAlertFromCenter animaton:NO];
+}
+
+- (void)buttonOnClickToAlertTop:(id)sender
+{
+    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] init];
+    alertView.contentView = [self aCustomView];
+    alertView.offset = CGPointMake(0, 50);
+    alertView.showStyle = ZYLShowAlertFromTop;
+    alertView.entablePanGestureRecognizer = YES;
+    [alertView show];
 }
 
 - (void)buttonOnClickToAlertCenter:(id)sender

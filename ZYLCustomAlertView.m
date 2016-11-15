@@ -182,11 +182,38 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             [self handldShowForCustomWithContentView:contentView];
             break;
         }
+        case ZYLShowAlertFromTop:{
+            [self handldShowForTopWithContentView:contentView];
+            break;
+        }
         default:
             break;
     }
 }
 
+- (void)handldShowForTopWithContentView:(UIView *)contentView
+{
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-(-%f)-[contentView(%f)]", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
+    
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[contentView(%f)]", CGRectGetWidth(contentView.frame)] options:NSLayoutFormatAlignAllCenterX metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
+    
+    //X轴居中显示
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[superview]-(<=1)-[contentView(height)]" options:NSLayoutFormatAlignAllCenterX metrics:@{@"height" : @(CGRectGetHeight(contentView.frame))} views:@{@"superview" : self, @"contentView" : contentView}]];
+    
+    //更新约束，确定原始位置
+    [self updateConstraints];
+    [self layoutIfNeeded];
+    
+    if(self.contentView) {
+        [self finderTopConstraintForView:contentView].constant = 0;
+        //更新约束，添加动画
+        [UIView animateWithDuration:0.25 animations:^{
+            [self updateConstraints];
+            [self layoutIfNeeded];
+            _backgroundView_p.backgroundColor = self.alertBackgroundColor;
+        }];
+    }
+}
 
 
 - (void)handldShowForBottomWithContentView:(UIView *)contentView
@@ -343,6 +370,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             if(self.tapDismissHandle) { self.tapDismissHandle(); }
             self.tools = nil;
             [self.contentView_p removeFromSuperview];
+            self.contentView_p = nil;
+            self.contentView = nil;
+            self.contentInputView = nil;
             [self removeFromSuperview];
 
         }
@@ -408,6 +438,16 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             break;
         }
             
+        case ZYLShowAlertFromTop:{
+            [self finderTopConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
+            [UIView animateWithDuration:0.25 animations:^{
+                [self updateConstraints];
+                [self layoutIfNeeded];
+                _backgroundView_p.backgroundColor = [UIColor clearColor];
+            }completion:finishedHandld];
+            break;
+        }
+            
     }
 }
 
@@ -432,6 +472,18 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (void)dismissEditView:(id)editView andHeight:(CGFloat)height
 {
     [self finderBottomConstraintForView:editView].constant = -height;
+}
+
+- (NSLayoutConstraint *)finderTopConstraintForView:(UIView *)view
+{
+    __block NSLayoutConstraint *temConstraint = nil;
+    [self.constraints enumerateObjectsUsingBlock:^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if(obj.firstItem==view && obj.firstAttribute == NSLayoutAttributeTop) {
+            temConstraint = obj;
+            *stop = YES;
+        }
+    }];
+    return temConstraint;
 }
 
 - (NSLayoutConstraint *)finderBottomConstraintForView:(UIView *)view
@@ -661,13 +713,11 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 - (void)setContentView:(UIView *)contentView
 {
-    _contentView = contentView;
     self.customAlertView.contentView = contentView;
 }
 
 - (void)setContentInputView:(UIView<ZYLCustomInputView> *)contentInputView
 {
-    _contentInputView = contentInputView;
     self.customAlertView.contentInputView = contentInputView;
 }
 
