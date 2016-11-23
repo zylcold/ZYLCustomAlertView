@@ -68,18 +68,17 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 + (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position;
 /**&lt; 使用默认方式展示一个自定义View */
 + (instancetype)addCustomView:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
-
 /**&lt; 使用默认方式展示一个自定义View */
 + (instancetype)showCustomView:(UIView *)customView addedTo:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton;
 
-
 /**&lt; 展示 */
 - (void)show;
-
 /**&lt; 隐藏 */
 - (void)dismissAlertView;
 
 
+
+- (void)dismissSheetView; __deprecated_msg("Method deprecated. Use `dismissAlertView`");
 
 @end
 

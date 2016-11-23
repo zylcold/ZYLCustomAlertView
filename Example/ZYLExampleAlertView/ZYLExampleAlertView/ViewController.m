@@ -7,7 +7,8 @@
 //
 
 #import "ViewController.h"
-#import <ZYLCustomAlertView/ZYLCustomAlertView.h>
+#import <ZYLCustomAlertView/ZYLCustomAlertTools.h>
+
 @interface ZYLDemoInputView : UIView<ZYLCustomInputView>
 @property(nonatomic, strong) UITextView *textView;
 - (void)inputViewBecomeFirstResponder;
@@ -60,6 +61,8 @@
     [[self aCustomButtonWithTitle:@"中间展示（无动画）" andNum:3] addTarget:self action:@selector(buttonOnClickToAlertCenterNoAnim) forControlEvents:UIControlEventTouchUpInside];
     [[self aCustomButtonWithTitle:@"底部展示InputView" andNum:4] addTarget:self action:@selector(buttonOnClickToAlertInputBottom:) forControlEvents:UIControlEventTouchUpInside];
     [[self aCustomButtonWithTitle:@"底部展示InputView2" andNum:5] addTarget:self action:@selector(buttonOnClickToAlertInput2Bottom:) forControlEvents:UIControlEventTouchUpInside];
+    [[self aCustomButtonWithTitle:@"TopToast展示" andNum:6] addTarget:self action:@selector(buttonOnClickToTopToast) forControlEvents:UIControlEventTouchUpInside];
+    
     self.datas = @[@"", @"", @"", @"", @"", @"", @"", @"", @"", @"", @""];
     
     
@@ -67,6 +70,11 @@
     UITapGestureRecognizer *tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapViewToAlert:)];
     [self.view addGestureRecognizer:tapGR];
 
+}
+
+- (void)buttonOnClickToTopToast
+{
+    [ZYLToastAlertView topToastMessage:@"hhhh"];
 }
 
 - (void)tapViewToAlert:(UITapGestureRecognizer *)tapGR

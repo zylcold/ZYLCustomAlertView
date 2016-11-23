@@ -9,6 +9,7 @@
 #import "ZYLCustomAlertView.h"
 
 #import "UIView+YLConstraintHelper.h"
+#import "ZYLCustomCenterAnimation.m"
 
 static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAnimation";
 @interface ZYLCustomAlertToolsView : UIView<UIGestureRecognizerDelegate>
@@ -195,6 +196,8 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 - (void)handldShowForTopWithContentView:(UIView *)contentView
 {
+    self.backgroundView_p.userInteractionEnabled = self.entableTapDismiss;
+    self.userInteractionEnabled = self.entableTapDismiss;
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-(-%f)-[contentView(%f)]", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
     
     [contentView yl_addOneselfConstrainToWidth:CGRectGetWidth(contentView.frame)];
@@ -218,6 +221,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 - (void)handldShowForBottomWithContentView:(UIView *)contentView
 {
+    self.backgroundView_p.userInteractionEnabled = YES;
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[contentView(%f)]-(-%f)-|", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
     
     [contentView yl_addOneselfConstrainToWidth:CGRectGetWidth(contentView.frame)];
@@ -261,7 +265,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 - (void)handldShowForCenterWithContentView:(UIView *)contentView
 {
-    
+    self.backgroundView_p.userInteractionEnabled = YES;
     [contentView yl_addOneselfConstrainToSize:contentView.frame.size];
     [self yl_addCenterConstrainToSubview:contentView offset:self.offset];
     
@@ -278,6 +282,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 - (void)handldShowForCustomWithContentView:(UIView *)contentView
 {
+    self.backgroundView_p.userInteractionEnabled = YES;
     CGFloat screenW = CGRectGetWidth([self mainScreen]);
     CGFloat contentViewX = CGRectGetMinX(contentView.frame);
     CGFloat contentViewY = CGRectGetMinY(contentView.frame);
@@ -599,47 +604,16 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 //MARK: 获取动画效果
 - (CABasicAnimation *)dismissTransfromAnimation
 {
-    CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    fooAnimation.fromValue = @(1);
-    fooAnimation.duration = 0.1;
-    fooAnimation.toValue = @(0);
-    fooAnimation.fillMode = kCAFillModeForwards;
-    fooAnimation.removedOnCompletion = NO;
-    fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.84 :.14 :.95 :0.42];
-    return fooAnimation;
+    return [ZYLCustomCenterAnimation dismissCenterScaleAnimation];
 }
 
 - (CABasicAnimation *)dismissTransfromTranslateAnimation
 {
-    CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.translation.y"];
-    fooAnimation.duration = 0.25;
-    fooAnimation.toValue = @([self mainScreen].size.height-CGRectGetMinX(self.contentView_p.frame));
-    fooAnimation.fillMode = kCAFillModeForwards;
-    fooAnimation.removedOnCompletion = NO;
-    return fooAnimation;
+    return [ZYLCustomCenterAnimation dismissCenterTransfromTranslateAnimationToValue:[self mainScreen].size.height-CGRectGetMinX(self.contentView_p.frame)];
 }
 - (CAAnimation *)transfromAnimation
 {
-    if([UIDevice currentDevice].systemVersion.floatValue >= 9.0) {
-        CASpringAnimation *spring = [CASpringAnimation animationWithKeyPath:@"transform.scale"];
-        spring.damping = 80;
-        spring.stiffness = 230;
-        spring.mass = 1.2;
-        spring.initialVelocity = 20;
-        spring.fromValue = @(0);
-        spring.toValue = @(1);
-        spring.duration = spring.settlingDuration;
-        return spring;
-    }else {
-        CABasicAnimation *fooAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-        fooAnimation.fromValue = @(0);
-        fooAnimation.duration = 0.25;
-        fooAnimation.toValue = @(1);
-        fooAnimation.fillMode = kCAFillModeForwards;
-        fooAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:.03 :.54 :.07 :0.98];
-        fooAnimation.removedOnCompletion = NO;
-        return fooAnimation;
-    }
+    return [ZYLCustomCenterAnimation showCenterScaleAnimationWithSpring];
 }
 
 @end
@@ -797,6 +771,11 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     alertView.showStyle = position;
     alertView.entableAnimation = animaton;
     return alertView;
+}
+
+- (void)dismissSheetView
+{
+    [self dismissAlertView];
 }
 
 @end
