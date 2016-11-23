@@ -9,7 +9,7 @@
 #import "ZYLCustomAlertView.h"
 
 #import "UIView+YLConstraintHelper.h"
-#import "ZYLCustomCenterAnimation.m"
+#import "ZYLCustomCenterAnimation.h"
 
 static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAnimation";
 @interface ZYLCustomAlertToolsView : UIView<UIGestureRecognizerDelegate>

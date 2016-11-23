@@ -78,7 +78,7 @@ typedef NS_OPTIONS(NSUInteger, ZYLAlertCompass) {
 
 
 
-- (void)dismissSheetView; __deprecated_msg("Method deprecated. Use `dismissAlertView`");
+- (void)dismissSheetView __deprecated_msg("Method deprecated. Use `dismissAlertView`");
 
 @end
 
