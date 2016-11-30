@@ -20,7 +20,7 @@
     bgView.backgroundColor = [UIColor whiteColor];
     messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [bgView yl_addEdgeConstrainToSubview:messageLabel inset:insets];
-    CGSize messageSize = [attr boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - insets.left - insets.right, MAXFLOAT) options:NSStringDrawingUsesFontLeading context:nil].size;
+    CGSize messageSize = [attr boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - insets.left - insets.right, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil].size;
     bgView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageSize.height + insets.top + insets.bottom);
     
     return bgView;
