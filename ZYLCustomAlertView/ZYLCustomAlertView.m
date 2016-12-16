@@ -31,16 +31,21 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 @property(nonatomic, strong) ZYLCustomAlertView *tools;
 @property(nonatomic, assign) CGPoint transformBegan;
 @property(nonatomic, assign, getter=isKeyboardShow) BOOL keyboardShow;
-
+//Custom 方位
 @property(nonatomic, assign) ZYLAlertCompass compass;
-
+//父控件
 @property(nonatomic, strong) UIView *toAddView;
+
+//私有Window
+@property(nonatomic, strong) UIWindow *keyWindow_p;
 
 - (void)show;
 - (void)dismissAlertView;
 @end
 @implementation ZYLCustomAlertToolsView
 
+
+//MARK: life cycle
 - (instancetype)initWithAddView:(UIView *)view
 {
     if(self = [super initWithFrame:view.bounds]) {
@@ -91,47 +96,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 }
 
 
-- (void)handldPanGRForNoShowCustom:(UIPanGestureRecognizer *)panGR
-{
-    switch (panGR.state) {
-        case UIGestureRecognizerStateBegan:{
-            _transformBegan =  [panGR translationInView: self.contentView_p];
-            break;
-        }
-        case UIGestureRecognizerStateChanged:{
-            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
-            CGFloat transformY = transformChanged.y-_transformBegan.y >= 0 ? transformChanged.y-_transformBegan.y : 0;
-            CGFloat screenHeight = CGRectGetHeight([self mainScreen]);
-            CGFloat progressToDismiss = (screenHeight - CGRectGetMinY(self.contentView_p.frame)  + .5*CGRectGetHeight(self.contentView_p.frame)) / (screenHeight - ((CGRectGetMinY(self.contentView_p.frame))-transformY) + .5*CGRectGetHeight(self.contentView_p.frame));
-            self.contentView_p.transform = CGAffineTransformMakeTranslation(0, transformY);
-            [UIView animateWithDuration:0.15 animations:^{
-                self.backgroundView_p.alpha = progressToDismiss;
-            }];
-            break;
-        }
-        case UIGestureRecognizerStateEnded:{
-            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
-            if(transformChanged.y-_transformBegan.y > CGRectGetHeight(self.contentView_p.frame)*.3) {
-                self.panToDismiss = YES;
-                [self dismissAlertView];
-            }else {
-                [UIView animateWithDuration:0.15 animations:^{
-                    self.contentView_p.transform = CGAffineTransformIdentity;
-                    self.backgroundView_p.alpha = 1;
-                }];
-            }
-            _transformBegan =  CGPointZero;
-            break;
-        }
-        default:{
-            [UIView animateWithDuration:0.15 animations:^{
-                self.contentView_p.transform = CGAffineTransformIdentity;
-            }];
-            break;
-        }
-    }
-
-}
 
 - (void)setEntableTapDismiss:(BOOL)entableTapDismiss
 {
@@ -194,10 +158,92 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }
 }
 
+- (void)dismissAlertView
+{
+    void(^finishedHandld)(BOOL finished) = ^(BOOL finished){
+        if(finished) {
+            if(self.tapDismissHandle) { self.tapDismissHandle(); }
+            self.tools = nil;
+            [self.contentView_p removeFromSuperview];
+            self.contentView_p = nil;
+            self.contentView = nil;
+            self.contentInputView = nil;
+            [self removeFromSuperview];
+            self->_keyWindow_p.hidden = YES;
+            self->_keyWindow_p = nil;
+        }
+    };
+    switch (_showStyle) {
+        case ZYLShowAlertFromBottom:{
+            [self handldDismissFromBottomWithFinish:finishedHandld];
+            break;
+        }
+        case ZYLShowAlertFromCenter:{
+            [self handldDismissFromCenterWithFinish:finishedHandld];
+            break;
+        }
+        case ZYLShowAlertFromCustom:{
+            [self handldDismissFromCustomWithFinish:finishedHandld];
+            break;
+        }
+            
+        case ZYLShowAlertFromTop:{
+            [self handldDismissFromTopWithFinish:finishedHandld];
+            break;
+        }
+            
+    }
+}
+
+
+//Handld Show
+- (void)handldPanGRForNoShowCustom:(UIPanGestureRecognizer *)panGR
+{
+    switch (panGR.state) {
+        case UIGestureRecognizerStateBegan:{
+            _transformBegan =  [panGR translationInView: self.contentView_p];
+            break;
+        }
+        case UIGestureRecognizerStateChanged:{
+            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
+            CGFloat transformY = transformChanged.y-_transformBegan.y >= 0 ? transformChanged.y-_transformBegan.y : 0;
+            CGFloat screenHeight = CGRectGetHeight([self mainScreen]);
+            CGFloat progressToDismiss = (screenHeight - CGRectGetMinY(self.contentView_p.frame)  + .5*CGRectGetHeight(self.contentView_p.frame)) / (screenHeight - ((CGRectGetMinY(self.contentView_p.frame))-transformY) + .5*CGRectGetHeight(self.contentView_p.frame));
+            self.contentView_p.transform = CGAffineTransformMakeTranslation(0, transformY);
+            [UIView animateWithDuration:0.15 animations:^{
+                self.backgroundView_p.alpha = progressToDismiss;
+            }];
+            break;
+        }
+        case UIGestureRecognizerStateEnded:{
+            CGPoint transformChanged =  [panGR translationInView: self.contentView_p];
+            if(transformChanged.y-_transformBegan.y > CGRectGetHeight(self.contentView_p.frame)*.3) {
+                self.panToDismiss = YES;
+                [self dismissAlertView];
+            }else {
+                [UIView animateWithDuration:0.15 animations:^{
+                    self.contentView_p.transform = CGAffineTransformIdentity;
+                    self.backgroundView_p.alpha = 1;
+                }];
+            }
+            _transformBegan =  CGPointZero;
+            break;
+        }
+        default:{
+            [UIView animateWithDuration:0.15 animations:^{
+                self.contentView_p.transform = CGAffineTransformIdentity;
+            }];
+            break;
+        }
+    }
+    
+}
+
 - (void)handldShowForTopWithContentView:(UIView *)contentView
 {
     self.backgroundView_p.userInteractionEnabled = self.entableTapDismiss;
     self.userInteractionEnabled = self.entableTapDismiss;
+    self.toAddView.userInteractionEnabled = self.entableTapDismiss;
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-(-%f)-[contentView(%f)]", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
     
     [contentView yl_addOneselfConstrainToWidth:CGRectGetWidth(contentView.frame)];
@@ -222,6 +268,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (void)handldShowForBottomWithContentView:(UIView *)contentView
 {
     self.backgroundView_p.userInteractionEnabled = YES;
+    self.toAddView.userInteractionEnabled = YES;
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[contentView(%f)]-(-%f)-|", CGRectGetHeight(contentView.frame),CGRectGetHeight(contentView.frame) ] options:0 metrics:nil views:NSDictionaryOfVariableBindings(contentView)]];
     
     [contentView yl_addOneselfConstrainToWidth:CGRectGetWidth(contentView.frame)];
@@ -266,6 +313,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (void)handldShowForCenterWithContentView:(UIView *)contentView
 {
     self.backgroundView_p.userInteractionEnabled = YES;
+    self.toAddView.userInteractionEnabled = YES;
     [contentView yl_addOneselfConstrainToSize:contentView.frame.size];
     [self yl_addCenterConstrainToSubview:contentView offset:self.offset];
     
@@ -283,6 +331,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 - (void)handldShowForCustomWithContentView:(UIView *)contentView
 {
     self.backgroundView_p.userInteractionEnabled = YES;
+    self.toAddView.userInteractionEnabled = YES;
     CGFloat screenW = CGRectGetWidth([self mainScreen]);
     CGFloat contentViewX = CGRectGetMinX(contentView.frame);
     CGFloat contentViewY = CGRectGetMinY(contentView.frame);
@@ -352,48 +401,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 
 
-
-
-- (void)tapTodismissAlertView
-{
-    [self.tools dismissAlertView];
-}
-
-- (void)dismissAlertView
-{
-    void(^finishedHandld)(BOOL finished) = ^(BOOL finished){
-        if(finished) {
-            if(self.tapDismissHandle) { self.tapDismissHandle(); }
-            self.tools = nil;
-            [self.contentView_p removeFromSuperview];
-            self.contentView_p = nil;
-            self.contentView = nil;
-            self.contentInputView = nil;
-            [self removeFromSuperview];
-        }
-    };
-    switch (_showStyle) {
-        case ZYLShowAlertFromBottom:{
-            [self handldDismissFromBottomWithFinish:finishedHandld];
-            break;
-        }
-        case ZYLShowAlertFromCenter:{
-            [self handldDismissFromCenterWithFinish:finishedHandld];
-            break;
-        }
-        case ZYLShowAlertFromCustom:{
-            [self handldDismissFromCustomWithFinish:finishedHandld];
-            break;
-        }
-            
-        case ZYLShowAlertFromTop:{
-            [self handldDismissFromTopWithFinish:finishedHandld];
-            break;
-        }
-            
-    }
-}
-
+//Handld Dismiss
 - (void)handldDismissFromTopWithFinish:(void(^)(BOOL))finishedHandld
 {
     [self finderTopConstraintForView:self.contentView_p].constant = -CGRectGetHeight(self.contentView_p.frame);
@@ -464,6 +472,11 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }
 }
 
+
+- (void)tapTodismissAlertView
+{
+    [self.tools dismissAlertView];
+}
 
 - (void)setContentView:(UIView *)contentView
 {
@@ -585,14 +598,14 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 //获取App KeyWindow
 - (UIWindow *)keyWindow_p
 {
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    if([[UIApplication sharedApplication].delegate respondsToSelector:@selector(window)]) {
-        if([[UIApplication sharedApplication].delegate window].keyWindow) {
-            keyWindow = [[UIApplication sharedApplication].delegate window];
-        }
+    if(!_keyWindow_p) {
+        _keyWindow_p = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        _keyWindow_p.windowLevel = UIWindowLevelStatusBar + 10;
+        _keyWindow_p.hidden = NO;
     }
-    return keyWindow;
+    return _keyWindow_p;
 }
+
 
 //获取展示区域的大小
 - (CGRect)mainScreen
@@ -617,7 +630,6 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 }
 
 @end
-
 
 
 @interface ZYLCustomAlertView()

@@ -37,7 +37,6 @@
     [self topToastMessageAttr:message inset:UIEdgeInsetsMake(30, 10, 10, 10)];
 }
 
-
 + (void)topToastMessageAttr:(NSAttributedString *)message inset:(UIEdgeInsets)inset
 {
     NSAttributedString *messageAttr = message;

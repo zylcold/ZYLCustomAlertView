@@ -18,5 +18,4 @@
 - (void)yl_addCenterConstrainToSubview:(UIView *)subview offset:(CGPoint)offsetY;
 
 - (void)yl_addEdgeConstrainToSubview:(UIView *)subview inset:(UIEdgeInsets)inset;
-
 @end
