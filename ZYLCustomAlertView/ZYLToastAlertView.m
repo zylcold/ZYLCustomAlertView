@@ -16,12 +16,13 @@
     UILabel *messageLabel = [[UILabel alloc] init];
     messageLabel.textAlignment = NSTextAlignmentCenter;
     messageLabel.attributedText = attr;
+    messageLabel.numberOfLines = 0;
     [bgView addSubview:messageLabel];
     bgView.backgroundColor = [UIColor whiteColor];
     messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [bgView yl_addEdgeConstrainToSubview:messageLabel inset:insets];
     CGSize messageSize = [attr boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - insets.left - insets.right, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil].size;
-    bgView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, messageSize.height + insets.top + insets.bottom);
+    bgView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, ceil(messageSize.height) + 1.0 + insets.top + insets.bottom);
     
     return bgView;
 }
