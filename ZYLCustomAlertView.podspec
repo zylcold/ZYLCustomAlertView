@@ -6,12 +6,11 @@
 Pod::Spec.new do |s|
 
   s.name         = "ZYLCustomAlertView"
-  s.version      = "0.1.2"
-  s.summary      = "CustomAlertView, That can Show a Custom View with animation."
+  s.version      = "0.1.3"
+  s.summary      = "CustomAlertView, That can show a custom view with animation."
 
   s.description  = <<-DESC
-                   This is a CustomAlertView, That can Show a Custom View with animation.
-                   Supported Bottom, Center to Show.
+                   This is a customAlertView, That can show a custom View with animation.Top, bottom, center to Show.
                    DESC
 
   s.homepage     = "https://github.com/zylcold"
