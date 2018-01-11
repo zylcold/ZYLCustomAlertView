@@ -585,7 +585,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
         [self showEditView:self.contentView_p withHeight:endR.size.height];
     }
     
-    void(^animations)() = ^{
+    void(^animations)(void) = ^{
         [self updateConstraints];
         [self layoutIfNeeded];
     };

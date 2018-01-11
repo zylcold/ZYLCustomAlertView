@@ -35,15 +35,20 @@
 + (CAAnimation *)showCenterScaleAnimationWithSpring
 {
     if([UIDevice currentDevice].systemVersion.floatValue >= 9.0) {
-        CASpringAnimation *spring = [CASpringAnimation animationWithKeyPath:@"transform.scale"];
-        spring.damping = 80;
-        spring.stiffness = 230;
-        spring.mass = 1.2;
-        spring.initialVelocity = 20;
-        spring.fromValue = @(0);
-        spring.toValue = @(1);
-        spring.duration = spring.settlingDuration;
-        return spring;
+        
+        if (@available(iOS 9.0, *)) {
+            CASpringAnimation *spring = [CASpringAnimation animationWithKeyPath:@"transform.scale"];
+            spring.damping = 80;
+            spring.stiffness = 230;
+            spring.mass = 1.2;
+            spring.initialVelocity = 20;
+            spring.fromValue = @(0);
+            spring.toValue = @(1);
+            spring.duration = spring.settlingDuration;
+            return spring;
+        }
+        return nil;
+        
     }else {
         return [self showCenterScaleAnimationWithBasic];
     }
