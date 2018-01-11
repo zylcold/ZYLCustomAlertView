@@ -779,7 +779,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 
 + (instancetype)showCustomView:(UIView *)customView addedTo:(UIView *)view forPosition:(ZYLShowAlertStyle)position animaton:(BOOL)animaton
 {
-    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:view addedTo:view];
+    ZYLCustomAlertView *alertView = [[ZYLCustomAlertView alloc] initWithContentView:customView addedTo:view];
     alertView.showStyle = position;
     alertView.entableAnimation = animaton;
     return alertView;
