@@ -39,6 +39,8 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
 //私有Window
 @property(nonatomic, strong) UIWindow *keyWindow_p;
 
+@property(nonatomic, assign) BOOL originStatus;
+
 - (void)show;
 - (void)dismissAlertView;
 @end
@@ -68,6 +70,9 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
     }else {
         self.toAddView = [self keyWindow_p];
     }
+    
+    self.originStatus = self.toAddView.userInteractionEnabled;
+    
     [self.toAddView.subviews enumerateObjectsUsingBlock:^(UIView *obj, NSUInteger idx, BOOL *stop) {
         if([obj isKindOfClass:[self class]]) {
             [obj removeFromSuperview];
@@ -171,6 +176,7 @@ static NSString *const kFinishAnimationKey = @"ZYLCustomAlertToolsView.FinishAni
             [self removeFromSuperview];
             self->_keyWindow_p.hidden = YES;
             self->_keyWindow_p = nil;
+            self.toAddView.userInteractionEnabled = self.originStatus;
         }
     };
     switch (_showStyle) {
